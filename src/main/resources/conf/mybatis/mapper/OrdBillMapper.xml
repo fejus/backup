@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.adatafun.airportshop.order.mapper.OrdBillMapper">
+  <resultMap id="BaseResultMap" type="com.adatafun.airportshop.order.pojo.po.OrdBill">
+    <id column="order_bill_id" jdbcType="INTEGER" property="orderBillId" />
+    <result column="order_id" jdbcType="VARCHAR" property="orderId" />
+    <result column="bill_type" jdbcType="VARCHAR" property="billType" />
+    <result column="company_name" jdbcType="VARCHAR" property="companyName" />
+    <result column="tax_number" jdbcType="VARCHAR" property="taxNumber" />
+    <result column="person_name" jdbcType="VARCHAR" property="personName" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="create_user" jdbcType="VARCHAR" property="createUser" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="update_user" jdbcType="VARCHAR" property="updateUser" />
+    <result column="is_deleted" jdbcType="INTEGER" property="isDeleted" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    order_bill_id, order_id, bill_type, company_name, tax_number, person_name, create_time, 
+    create_user, update_time, update_user, is_deleted
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from ord_bill
+    where order_bill_id = #{orderBillId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from ord_bill
+    where order_bill_id = #{orderBillId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.adatafun.airportshop.order.pojo.po.OrdBill">
+    insert into ord_bill (order_bill_id, order_id, bill_type, 
+      company_name, tax_number, person_name, 
+      create_time, create_user, update_time, 
+      update_user, is_deleted)
+    values (#{orderBillId,jdbcType=INTEGER}, #{orderId,jdbcType=VARCHAR}, #{billType,jdbcType=VARCHAR}, 
+      #{companyName,jdbcType=VARCHAR}, #{taxNumber,jdbcType=VARCHAR}, #{personName,jdbcType=VARCHAR}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{createUser,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP}, 
+      #{updateUser,jdbcType=VARCHAR}, #{isDeleted,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="com.adatafun.airportshop.order.pojo.po.OrdBill">
+    insert into ord_bill
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="orderBillId != null">
+        order_bill_id,
+      </if>
+      <if test="orderId != null">
+        order_id,
+      </if>
+      <if test="billType != null">
+        bill_type,
+      </if>
+      <if test="companyName != null">
+        company_name,
+      </if>
+      <if test="taxNumber != null">
+        tax_number,
+      </if>
+      <if test="personName != null">
+        person_name,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="createUser != null">
+        create_user,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+      <if test="updateUser != null">
+        update_user,
+      </if>
+      <if test="isDeleted != null">
+        is_deleted,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="orderBillId != null">
+        #{orderBillId,jdbcType=INTEGER},
+      </if>
+      <if test="orderId != null">
+        #{orderId,jdbcType=VARCHAR},
+      </if>
+      <if test="billType != null">
+        #{billType,jdbcType=VARCHAR},
+      </if>
+      <if test="companyName != null">
+        #{companyName,jdbcType=VARCHAR},
+      </if>
+      <if test="taxNumber != null">
+        #{taxNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="personName != null">
+        #{personName,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createUser != null">
+        #{createUser,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateUser != null">
+        #{updateUser,jdbcType=VARCHAR},
+      </if>
+      <if test="isDeleted != null">
+        #{isDeleted,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.adatafun.airportshop.order.pojo.po.OrdBill">
+    update ord_bill
+    <set>
+      <if test="orderId != null">
+        order_id = #{orderId,jdbcType=VARCHAR},
+      </if>
+      <if test="billType != null">
+        bill_type = #{billType,jdbcType=VARCHAR},
+      </if>
+      <if test="companyName != null">
+        company_name = #{companyName,jdbcType=VARCHAR},
+      </if>
+      <if test="taxNumber != null">
+        tax_number = #{taxNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="personName != null">
+        person_name = #{personName,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createUser != null">
+        create_user = #{createUser,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateUser != null">
+        update_user = #{updateUser,jdbcType=VARCHAR},
+      </if>
+      <if test="isDeleted != null">
+        is_deleted = #{isDeleted,jdbcType=INTEGER},
+      </if>
+    </set>
+    where order_bill_id = #{orderBillId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.adatafun.airportshop.order.pojo.po.OrdBill">
+    update ord_bill
+    set order_id = #{orderId,jdbcType=VARCHAR},
+      bill_type = #{billType,jdbcType=VARCHAR},
+      company_name = #{companyName,jdbcType=VARCHAR},
+      tax_number = #{taxNumber,jdbcType=VARCHAR},
+      person_name = #{personName,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      create_user = #{createUser,jdbcType=VARCHAR},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      update_user = #{updateUser,jdbcType=VARCHAR},
+      is_deleted = #{isDeleted,jdbcType=INTEGER}
+    where order_bill_id = #{orderBillId,jdbcType=INTEGER}
+  </update>
+</mapper>
