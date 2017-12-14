@@ -14,14 +14,12 @@ import java.util.List;
 public class H5OrderDTO implements Serializable {
     @NotNull(message = "无语言标识")
     private String language;//语言
-    @NotNull(message = "无用户标识")
-    private String clientId;//用户标识
     @NotNull(message = "无商户标识")
     private String enterpriseId;//商户编码
     @NotNull(message = "无门店标识")
     private String storeId;//门店编码
     @NotNull(message = "桌号不能为空")
-    private String destNumber;//桌号
+    private String deskNumber;//桌号
     @NotNull(message = "使用人数不能为空")
     @Max(value = 10, message = "最大人数不能超多10人")
     private Integer useNumber;//使用人数
@@ -37,14 +35,6 @@ public class H5OrderDTO implements Serializable {
 
     public void setLanguage(String language) {
         this.language = language;
-    }
-
-    public String getClientId() {
-        return clientId;
-    }
-
-    public void setClientId(String clientId) {
-        this.clientId = clientId;
     }
 
     public String getEnterpriseId() {
@@ -63,12 +53,12 @@ public class H5OrderDTO implements Serializable {
         this.storeId = storeId;
     }
 
-    public String getDestNumber() {
-        return destNumber;
+    public String getDeskNumber() {
+        return deskNumber;
     }
 
-    public void setDestNumber(String destNumber) {
-        this.destNumber = destNumber;
+    public void setDeskNumber(String deskNumber) {
+        this.deskNumber = deskNumber;
     }
 
     public Integer getUseNumber() {

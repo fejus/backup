@@ -4,7 +4,7 @@ import java.util.Date;
 
 /**
  * @table_name: ord_order.java
- * @date: 2017-11-08 10:42:17
+ * @date: 2017-11-28 19:52:54
  * @author: Lin
  * @version: 1.0
  * Copyright(C) 2017 杭州风数信息科技有限公司
@@ -15,6 +15,11 @@ public class OrdOrder {
      * 
      */
     private String orderId;
+
+    /**
+     * 下单渠道
+     */
+    private String orderChannel;
 
     /**
      * 订单编码
@@ -75,12 +80,7 @@ public class OrdOrder {
     /**
      * 桌号
      */
-    private String destNumber;
-
-    /**
-     * 订单渠道
-     */
-    private String orderChannel;
+    private String deskNumber;
 
     /**
      * 订单金额
@@ -123,6 +123,26 @@ public class OrdOrder {
     private String airportCode;
 
     /**
+     * 小程序下单时的表单formid
+     */
+    private String formId;
+
+    /**
+     * 取餐码
+     */
+    private String getFoodNumber;
+
+    /**
+     * 通知取餐状态
+     */
+    private Integer notifyStatus;
+
+    /**
+     * 通知取餐阅读状态
+     */
+    private Integer notifyReadStatus;
+
+    /**
      * 创建时间
      */
     private Date createTime;
@@ -161,6 +181,22 @@ public class OrdOrder {
      */
     public void setOrderId(String orderId) {
         this.orderId = orderId;
+    }
+
+    /**
+     * 下单渠道
+     * @return order_channel 下单渠道
+     */
+    public String getOrderChannel() {
+        return orderChannel;
+    }
+
+    /**
+     * 下单渠道
+     * @param orderChannel 下单渠道
+     */
+    public void setOrderChannel(String orderChannel) {
+        this.orderChannel = orderChannel;
     }
 
     /**
@@ -345,34 +381,18 @@ public class OrdOrder {
 
     /**
      * 桌号
-     * @return dest_number 桌号
+     * @return desk_number 桌号
      */
-    public String getDestNumber() {
-        return destNumber;
+    public String getDeskNumber() {
+        return deskNumber;
     }
 
     /**
      * 桌号
-     * @param destNumber 桌号
+     * @param deskNumber 桌号
      */
-    public void setDestNumber(String destNumber) {
-        this.destNumber = destNumber;
-    }
-
-    /**
-     * 订单渠道
-     * @return order_channel 订单渠道
-     */
-    public String getOrderChannel() {
-        return orderChannel;
-    }
-
-    /**
-     * 订单渠道
-     * @param orderChannel 订单渠道
-     */
-    public void setOrderChannel(String orderChannel) {
-        this.orderChannel = orderChannel;
+    public void setDeskNumber(String deskNumber) {
+        this.deskNumber = deskNumber;
     }
 
     /**
@@ -501,6 +521,70 @@ public class OrdOrder {
      */
     public void setAirportCode(String airportCode) {
         this.airportCode = airportCode;
+    }
+
+    /**
+     * 小程序下单时的表单formid
+     * @return form_id 小程序下单时的表单formid
+     */
+    public String getFormId() {
+        return formId;
+    }
+
+    /**
+     * 小程序下单时的表单formid
+     * @param formId 小程序下单时的表单formid
+     */
+    public void setFormId(String formId) {
+        this.formId = formId;
+    }
+
+    /**
+     * 取餐码
+     * @return get_food_number 取餐码
+     */
+    public String getGetFoodNumber() {
+        return getFoodNumber;
+    }
+
+    /**
+     * 取餐码
+     * @param getFoodNumber 取餐码
+     */
+    public void setGetFoodNumber(String getFoodNumber) {
+        this.getFoodNumber = getFoodNumber;
+    }
+
+    /**
+     * 通知取餐状态
+     * @return notify_status 通知取餐状态
+     */
+    public Integer getNotifyStatus() {
+        return notifyStatus;
+    }
+
+    /**
+     * 通知取餐状态
+     * @param notifyStatus 通知取餐状态
+     */
+    public void setNotifyStatus(Integer notifyStatus) {
+        this.notifyStatus = notifyStatus;
+    }
+
+    /**
+     * 通知取餐阅读状态
+     * @return notify_read_status 通知取餐阅读状态
+     */
+    public Integer getNotifyReadStatus() {
+        return notifyReadStatus;
+    }
+
+    /**
+     * 通知取餐阅读状态
+     * @param notifyReadStatus 通知取餐阅读状态
+     */
+    public void setNotifyReadStatus(Integer notifyReadStatus) {
+        this.notifyReadStatus = notifyReadStatus;
     }
 
     /**

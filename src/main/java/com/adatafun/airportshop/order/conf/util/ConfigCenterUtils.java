@@ -24,15 +24,7 @@ public class ConfigCenterUtils {
 
     public static void connect(String appName) throws InterruptedException {
         String localEnv = System.getenv("local_env");
-        if(localEnv != null && localEnv.length() !=0){
             connect();
-        }else {
-            // 测试配置中心
-            ConfigDataManager dataChange = new ConfigDataManager();
-            appProperties = new AppProperties(appName);
-            appProperties.registerDataChangeHandler(dataChange);
-            appProperties.init();
-        }
     }
 
     private static void connect() throws InterruptedException {

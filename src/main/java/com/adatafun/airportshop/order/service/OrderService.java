@@ -1,33 +1,42 @@
 package com.adatafun.airportshop.order.service;
 
-import com.adatafun.airportshop.order.common.enums.BooleanEnum;
-import com.adatafun.airportshop.order.common.enums.ChannelType;
-import com.adatafun.airportshop.order.common.enums.OrderStatus;
-import com.adatafun.airportshop.order.common.enums.PayStatus;
+import com.adatafun.airportshop.order.common.enums.*;
+import com.adatafun.airportshop.order.common.util.HttpClientUtils;
+import com.adatafun.airportshop.order.common.util.OrderNoUtil;
 import com.adatafun.airportshop.order.mapper.*;
+import com.adatafun.airportshop.order.pojo.dto.EnterpriseInfoDTO;
+import com.adatafun.airportshop.order.pojo.dto.NotifyGetFoodInfoDTO;
 import com.adatafun.airportshop.order.pojo.dto.OrderListQueryParamDTO;
+import com.adatafun.airportshop.order.pojo.dto.StoreInfoDTO;
+import com.adatafun.airportshop.order.pojo.vo.ProductForOrder;
 import com.adatafun.airportshop.order.pojo.po.*;
 import com.adatafun.airportshop.order.pojo.vo.OrderDetailVO;
 import com.adatafun.airportshop.order.pojo.vo.OrderItemVO;
+import com.adatafun.airportshop.order.pojo.vo.OrderListExportResultVO;
+import com.adatafun.airportshop.order.pojo.vo.SubOrderDetailVO;
+import com.adatafun.airportshop.order.service.rpc.MemberUserService;
+import com.adatafun.airportshop.order.service.rpc.ShopInfoService;
+import com.adatafun.airportshop.order.service.rpc.ShopProductService;
 import com.adatafun.utils.api.ResUtils;
 import com.adatafun.utils.api.Result;
 import com.adatafun.utils.common.DateUtils;
-import com.adatafun.utils.common.StringUtils;
-import com.adatafun.utils.common.UUIDUtil;
+ import com.adatafun.utils.common.UUIDUtil;
 import com.adatafun.utils.mybatis.common.ResponsePage;
 import com.adatafun.utils.translate.LanguageEnum;
 import com.adatafun.utils.translate.LanguageUtil;
 import com.alibaba.fastjson.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Random;
 
 /**
  * desc : 订单服务
@@ -36,6 +45,8 @@ import java.util.Random;
 @Service
 @Transactional(propagation = Propagation.REQUIRED)
 public class OrderService {
+    private static Logger log = LoggerFactory.getLogger(OrderService.class);
+
 
     @Autowired
     private OrdOrderMapper ordOrderMapper;
@@ -47,6 +58,12 @@ public class OrderService {
     private OrdSubOrderLanguageMapper ordSubOrderLanguageMapper;
     @Autowired
     private OrdBillMapper ordBillMapper;
+    @Autowired
+    private MemberUserService memberUserService;
+    @Autowired
+    private ShopProductService shopProductService;
+    @Autowired
+    private ShopInfoService shopInfoService;
 
     /**
      * 下单
@@ -59,23 +76,32 @@ public class OrderService {
      */
     public String saveOrder(OrdOrder ordOrder, OrdOrderLanguage oriOrderLanguage, List<OrdSubOrder> subOrders, OrdBill ordBill) {
         //查询商户信息
-        JSONObject merchantInfo = new JSONObject();
+        List<EnterpriseInfoDTO> enterpriseInfoLanguages = shopInfoService.getEnterpriseInfo(ordOrder.getEnterpriseId());
 
         //查询门店信息
-        JSONObject storeInfo = new JSONObject();
+        List<StoreInfoDTO> storeInfoLanguages = shopInfoService.getStoreInfo(ordOrder.getStoreId());
 
         //查询菜品及其规格信息
-        List<JSONObject> products = new ArrayList<>();
-        List<JSONObject> specifications = new ArrayList<>();
+        List<String> specicationIds = new ArrayList<>();
+        for (OrdSubOrder ordSubOrder : subOrders) {
+            specicationIds.add(ordSubOrder.getSpecificationId());
+        }
+        List<List<ProductForOrder>> specifications = shopProductService.getProductInfo(StringUtils.collectionToDelimitedString(specicationIds,","));
+        //to 做产品信息的校验
 
-        //保存主订单
-        saveMainOrder(ordOrder, subOrders, oriOrderLanguage, merchantInfo, storeInfo);
 
+        String orderId = UUIDUtil.getUUID();
         //保存子订单
-        saveSubOrder(ordOrder, subOrders, products, specifications);
+        saveSubOrder(orderId, subOrders, specifications, ordOrder.getLanguage());
+        //保存主订单
+        ordOrder.setOrderId(orderId);
+        saveMainOrder(ordOrder, subOrders, oriOrderLanguage, enterpriseInfoLanguages, storeInfoLanguages);
+
+        //进行菜品库存的更改
+
 
         //保存发票信息
-        saveBillInfo(ordOrder, ordBill);
+        //saveBillInfo(ordOrder, ordBill);
 
         return null;
 
@@ -87,13 +113,13 @@ public class OrderService {
      * @param oriOrderLanguage 语言
      * @param subOrders        子订单
      * @param ordOrder         订单
-     * @param merchantInfo     商户信息
-     * @param storeInfo        门店信息
+     * @param enterpriseInfoLanguages     商户信息
+     * @param storeInfoLanguages        门店信息
      * @return
      */
-    public void saveMainOrder(OrdOrder ordOrder, List<OrdSubOrder> subOrders, OrdOrderLanguage oriOrderLanguage, JSONObject merchantInfo, JSONObject storeInfo) {
+    public void saveMainOrder(OrdOrder ordOrder, List<OrdSubOrder> subOrders, OrdOrderLanguage oriOrderLanguage, List<EnterpriseInfoDTO> enterpriseInfoLanguages, List<StoreInfoDTO> storeInfoLanguages) {
         //生成订单编码
-        String orderNo = new Date().getTime() + new Random().nextInt(100) + "";
+        String orderNo = OrderNoUtil.createOrderNo(OrderType.TS_ORDER, ChannelType.getEnumByValue(ordOrder.getOrderChannel()));
         ordOrder.setOrderNo(orderNo);
         ordOrder.setOrderId(UUIDUtil.getUUID());
 
@@ -113,7 +139,7 @@ public class OrderService {
         ordOrderMapper.insert(ordOrder);
 
         //处理多语言
-        saveMainOrderLanguage(ordOrder, oriOrderLanguage, merchantInfo, storeInfo);
+        saveMainOrderLanguage(ordOrder, oriOrderLanguage, enterpriseInfoLanguages, storeInfoLanguages);
 
 
     }
@@ -124,28 +150,38 @@ public class OrderService {
      *
      * @param ordOrder
      * @param oriOrderLanguage
-     * @param merchantInfo     商户信息
-     * @param storeInfo        门店信息
+     * @param enterpriseInfoLanguages     商户信息
+     * @param storeInfoLanguages        门店信息
      */
-    public void saveMainOrderLanguage(OrdOrder ordOrder, OrdOrderLanguage oriOrderLanguage, JSONObject merchantInfo, JSONObject storeInfo) {
+    public void saveMainOrderLanguage(OrdOrder ordOrder, OrdOrderLanguage oriOrderLanguage, List<EnterpriseInfoDTO> enterpriseInfoLanguages, List<StoreInfoDTO> storeInfoLanguages) {
         //多语言处理
         LanguageEnum oriLanguageEnum = LanguageEnum.getEnumByValue(ordOrder.getLanguage());
         List<OrdOrderLanguage> ordOrderLanguages = new ArrayList<>();
         ordOrderLanguages.add(oriOrderLanguage);
 
         List<String> languages = new ArrayList<>();//商家支持的多语言列表
+        languages.add(LanguageEnum.ZH_CN.value());
+        languages.add(LanguageEnum.EN.value());
         for (String language : languages) {
             LanguageEnum languageEnum = LanguageEnum.getEnumByValue(language);
             if (!ordOrder.getLanguage().equals(language)) {
                 OrdOrderLanguage orderLanguage = new OrdOrderLanguage();
                 orderLanguage.setLanguage(language);
-                orderLanguage.setEnterpriseName(LanguageUtil.getTransResult("肯德基", oriLanguageEnum, languageEnum));//商户名称
-                orderLanguage.setStoreName(LanguageUtil.getTransResult("肯德基一店", oriLanguageEnum, languageEnum));//门店名称
+                for (EnterpriseInfoDTO enterpriseInfoDTO : enterpriseInfoLanguages) {
+                    if (language.equals(enterpriseInfoDTO.getLanguage())) {
+                        orderLanguage.setEnterpriseName(enterpriseInfoDTO.getCompanyName());//商户名称
+                    }
+                }
+                for (StoreInfoDTO storeInfoDTO : storeInfoLanguages) {
+                    if (language.equals(storeInfoDTO.getLanguage())) {
+                        orderLanguage.setStoreName(storeInfoDTO.getStoreName());//门店名称
+                    }
+                }
                 orderLanguage.setOrderId(ordOrder.getOrderId());
-                if (StringUtils.isNotBlank(oriOrderLanguage.getRemarks())) {
+                if (!StringUtils.isEmpty(oriOrderLanguage.getRemarks())) {
                     orderLanguage.setRemarks(LanguageUtil.getTransResult(oriOrderLanguage.getRemarks(), oriLanguageEnum, languageEnum));
                 }
-                if (StringUtils.isNotBlank(oriOrderLanguage.getStoreRemarks())) {
+                if (!StringUtils.isEmpty(oriOrderLanguage.getStoreRemarks())) {
                     orderLanguage.setRemarks(LanguageUtil.getTransResult(oriOrderLanguage.getStoreRemarks(), oriLanguageEnum, languageEnum));
                 }
                 orderLanguage.setCreateTime(oriOrderLanguage.getCreateTime());
@@ -167,27 +203,24 @@ public class OrderService {
     /**
      * 保存子订单
      *
-     * @param ordOrder       主订单数据
+     * @param orderId 订单编码
      * @param subOrders      子订单列表
-     * @param products       菜品列表
      * @param specifications 菜品规格列表
+     * @param language 语言
      */
-    public void saveSubOrder(OrdOrder ordOrder, List<OrdSubOrder> subOrders, List<JSONObject> products, List<JSONObject> specifications) {
+    public void saveSubOrder(String orderId, List<OrdSubOrder> subOrders, List<List<ProductForOrder>> specifications, String language) {
         for (int i = 0; i < subOrders.size(); i++) {
             OrdSubOrder subOrder = subOrders.get(i);
             subOrder.setSubOrderId(UUIDUtil.getUUID());
-            JSONObject specification = specifications.get(i);
-            JSONObject product = products.get(i);
-            subOrder.setOrderId(ordOrder.getOrderId());
-            subOrder.setProductImg(specification.getString(""));//图片
-            subOrder.setUnitPrice(specification.getInteger("price"));//单价
+            List<ProductForOrder> specification = specifications.get(i);
+            subOrder.setOrderId(orderId);
+            subOrder.setProductImg(specification.get(0).getProductCoverImg());//图片
+            subOrder.setUnitPrice(specification.get(0).getSpecificationPrice());//单价
             subOrder.setTotalPrice(subOrder.getProductNumber() * subOrder.getUnitPrice());//单品总价
-            subOrder.setCreateTime(ordOrder.getCreateTime());
-            subOrder.setCreateUser(ordOrder.getCreateUser());
+            subOrder.setCreateTime(new Date());
             ordSubOrderMapper.insert(subOrder);
-
             //处理多语言
-            saveSubOrderLanguage(ordOrder, subOrder, product, specification);
+            saveSubOrderLanguage(language, subOrder, specification);
 
         }
     }
@@ -195,23 +228,27 @@ public class OrderService {
     /**
      * 处理子订单多语言
      *
-     * @param ordOrder
      * @param subOrder
-     * @param product
      * @param specification
      */
-    public void saveSubOrderLanguage(OrdOrder ordOrder, OrdSubOrder subOrder, JSONObject product, JSONObject specification) {
+    public void saveSubOrderLanguage(String oriLanguage, OrdSubOrder subOrder, List<ProductForOrder> specification) {
         //多语言处理
-        LanguageEnum oriLanguageEnum = LanguageEnum.getEnumByValue(ordOrder.getLanguage());
+        LanguageEnum oriLanguageEnum = LanguageEnum.getEnumByValue(oriLanguage);
         List<OrdSubOrderLanguage> orderLanguages = new ArrayList<>();
 
         List<String> languages = new ArrayList<>();//商家支持的多语言列表
+        languages.add(LanguageEnum.ZH_CN.value());
+        languages.add(LanguageEnum.EN.value());
         for (String language : languages) {
             LanguageEnum languageEnum = LanguageEnum.getEnumByValue(language);
             OrdSubOrderLanguage orderLanguage = new OrdSubOrderLanguage();
             orderLanguage.setLanguage(language);
-            orderLanguage.setProductName(product.getString(""));
-            orderLanguage.setSpecificationName(specification.getString(""));
+            for (ProductForOrder productForOrder : specification) {
+                if (language.equals(productForOrder.getLanguage())) {
+                    orderLanguage.setProductName(productForOrder.getProductName());
+                    orderLanguage.setSpecificationName(productForOrder.getSpecificationName());
+                }
+            }
             orderLanguage.setSubOrderId(subOrder.getSubOrderId());
             orderLanguage.setCreateTime(subOrder.getCreateTime());
             orderLanguages.add(orderLanguage);
@@ -281,6 +318,30 @@ public class OrderService {
         return orderDetailVO;
     }
 
+    /**
+     * 订单分页
+     *
+     * @param queryParam
+     * @return
+     */
+    public ResponsePage<List<OrderItemVO>> orderListByPageForMemberUser(OrderListQueryParamDTO queryParam) {
+        ResponsePage<List<OrderItemVO>> responsePage = new ResponsePage<>();
+
+        List<OrderItemVO> list = new ArrayList<>();
+        int totalRows = ordOrderMapper.countOrder(queryParam);
+        if (totalRows > 0) {
+            list = ordOrderMapper.selectOrderListByPage(queryParam);
+        }
+
+        //设置分页结果
+        responsePage.setPage(queryParam.getPage());
+        responsePage.setRows(queryParam.getRows());
+        responsePage.setTotalRows(totalRows);
+        responsePage.setList(list);
+
+        return responsePage;
+    }
+
 
     /**
      * 订单分页
@@ -301,27 +362,68 @@ public class OrderService {
         responsePage.setPage(queryParam.getPage());
         responsePage.setRows(queryParam.getRows());
         responsePage.setTotalRows(totalRows);
-        responsePage.setData(list);
+        responsePage.setList(list);
 
         return responsePage;
     }
 
     /**
+     * 通知取餐
      * @param orderId    订单编码
      * @param operatorId
      */
-    public void notifyGetFood(String orderId, String operatorId) {
+    public Result notifyGetFood(String orderId, String operatorId) {
         OrdOrder ordOrder = ordOrderMapper.selectByPrimaryKey(orderId);
         if (ordOrder != null) {
+            OrderDetailVO orderDetailVO = ordOrderMapper.selectOrderDetailByOrderId(orderId, ordOrder.getLanguage());
             //查询会员信息
-
+            JSONObject userInfo = memberUserService.getMemberUserByUserId(ordOrder.getClientId());
+            if (null == userInfo) {
+                return ResUtils.result(Result.STATUS.BAD_REQUEST.getStatus(), "查询不到该用户信息");
+            }
+            String getFoodNumber = OrderNoUtil.createGetFoodNumber(ordOrder.getEnterpriseId());
+            if (null == getFoodNumber) {
+                return ResUtils.result(Result.STATUS.BAD_REQUEST.getStatus(), "生成取餐码失败");
+            }
             //发送取餐通知
+            NotifyGetFoodInfoDTO notifyGetFoodInfoDTO = new NotifyGetFoodInfoDTO();
+            notifyGetFoodInfoDTO.setCreateTime(DateUtils.format(ordOrder.getCreateTime(), "yyyy-MM-dd HH:mm:ss"));
+            notifyGetFoodInfoDTO.setEnterpriseId(ordOrder.getEnterpriseId());
+            notifyGetFoodInfoDTO.setFormId(ordOrder.getFormId());
+            notifyGetFoodInfoDTO.setGetFoodNumber(getFoodNumber);
+            notifyGetFoodInfoDTO.setOpenId(userInfo.getString("openId"));
+            notifyGetFoodInfoDTO.setOrderNo(ordOrder.getOrderNo());
+            notifyGetFoodInfoDTO.setOrderType(OrderType.TS_ORDER.value());
+            notifyGetFoodInfoDTO.setPlatform(ordOrder.getOrderChannel());
 
+            StringBuilder productNames = new StringBuilder();
+            for (SubOrderDetailVO subOrderDetailVO : orderDetailVO.getSubOrderProList()) {
+                productNames.append(subOrderDetailVO.getProductName() + "x" + subOrderDetailVO.getProductNumber() + ";");
+            }
+            notifyGetFoodInfoDTO.setProductName(productNames.toString());
+            notifyGetFoodInfoDTO.setStoreName(orderDetailVO.getStoreName());
+            notifyGetFoodInfoDTO.setRemark("这是一条备注");
+            notifyGetFoodInfoDTO.setUrl("www.baidu.com");
+
+            String requestUrl = "http://localhost:8888/msgTemplate/notifyGetFood";
+            try {
+                String result = HttpClientUtils.post(requestUrl, JSONObject.toJSONString(notifyGetFoodInfoDTO));
+                Result notifyResult = JSONObject.parseObject(result, Result.class);
+                if (Result.STATUS.SUCCESS.getStatus() != notifyResult.getStatus()) {
+                    return ResUtils.result(Result.STATUS.BAD_REQUEST.getStatus(), "通知取餐失败");
+                }
+            } catch (Exception e) {
+                log.error("通知取餐失败", e);
+                return ResUtils.result(Result.STATUS.BAD_REQUEST.getStatus(), "通知取餐失败");
+            }
             //修改订单状态
             ordOrder.setOrderStatus(OrderStatus.HAVE_NOTIFY.value());
             ordOrder.setUpdateTime(new Date());
             ordOrder.setUpdateUser(operatorId);
             ordOrderMapper.updateByPrimaryKeySelective(ordOrder);
+            return ResUtils.result(Result.STATUS.SUCCESS);
+        } else {
+            return ResUtils.result(Result.STATUS.BAD_REQUEST.getStatus(), "查询不到该订单");
         }
     }
 
@@ -383,6 +485,25 @@ public class OrderService {
         ordOrderMapper.updateByPrimaryKeySelective(ordOrder);
 
     }
+
+    /**
+     * 查询导出结果
+     *
+     * @param queryParam
+     * @return
+     */
+    public List<OrderListExportResultVO> queryOrderListForExport(OrderListQueryParamDTO queryParam) {
+        List<OrderListExportResultVO> list = ordOrderMapper.selectOrderListForExport(queryParam);
+
+        //做枚举值的转换
+        for (OrderListExportResultVO vo : list) {
+            vo.setOrderStatus(OrderStatus.getDisplayByValue(vo.getOrderStatus()));
+            vo.setPayStatus(PayStatus.getDisplayByValue(vo.getPayStatus()));
+            vo.setPayType(PayType.getDisplayByValue(vo.getPayType()));
+        }
+        return list;
+    }
+
 
 
 }

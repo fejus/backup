@@ -1,6 +1,9 @@
 package com.adatafun.airportshop.order.controller.opeartionoplatform;
 
-import com.adatafun.airportshop.order.common.annotation.ApiPath;
+import com.adatafun.common.springthrift.annotation.RequestBody;
+import com.adatafun.common.springthrift.annotation.RequestMapping;
+import com.adatafun.common.springthrift.annotation.RequestParam;
+import com.adatafun.common.springthrift.annotation.ThriftRequest;
 import com.adatafun.airportshop.order.common.enums.ChannelType;
 import com.adatafun.airportshop.order.pojo.dto.OrderListQueryParamDTO;
 import com.adatafun.airportshop.order.pojo.vo.OrderDetailVO;
@@ -12,6 +15,7 @@ import com.adatafun.utils.mybatis.common.ResponsePage;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Controller;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +24,8 @@ import java.util.List;
  * desc :
  * Created by Lin on 2017/11/9.
  */
-@Component
+@Controller
+@RequestMapping(value = "op")
 public class OpOrderController {
     @Autowired
     private OrderService orderService;
@@ -29,13 +34,11 @@ public class OpOrderController {
     /**
      * 订单详情
      *
-     * @param request
+     * @param
      * @return
      */
-    @ApiPath(value = "op/orderDetail")
-    public String orderDetail(JSONObject request) {
-        String orderId = request.getString("orderId");
-        String language = request.getString("language");
+    @RequestMapping(value = "/orderDetail")
+    public String orderDetail(@RequestParam(name = "orderId") String orderId, @RequestParam(name = "language") String language) {
         OrderDetailVO orderDetailVO = orderService.orderDetail(orderId, language);
         return JSONObject.toJSONString(ResUtils.result(orderDetailVO));
     }
@@ -47,8 +50,8 @@ public class OpOrderController {
      * @param request
      * @return
      */
-    @ApiPath(value = "op/orderList")
-    public String orderList(JSONObject request) {
+    @RequestMapping(value = "/orderList")
+    public String orderList(@ThriftRequest  JSONObject request) {
 
         OrderListQueryParamDTO queryParam = request.toJavaObject(OrderListQueryParamDTO.class);
         ResponsePage<List<OrderItemVO>> responsePage = orderService.orderListByPage(queryParam);
@@ -58,11 +61,12 @@ public class OpOrderController {
 
 
     /**
+     * 运营平台取消订单
      * @param request
      * @return
      */
-    @ApiPath(value = "op/cancelOrder")
-    public String cancelOrder(JSONObject request) {
+    @RequestMapping(value = "/cancelOrder")
+    public String cancelOrder(@ThriftRequest JSONObject request) {
         String operatorId = null;
         String orderId = request.getString("orderIds");
         List<String> orderIds = new ArrayList<>();

@@ -1,8 +1,8 @@
 package com.adatafun.airportshop.order.controller.background;
 
-import com.adatafun.airportshop.order.common.annotation.ApiPath;
 import com.adatafun.airportshop.order.common.enums.ChannelType;
 import com.adatafun.airportshop.order.pojo.dto.BackgroundOrderDTO;
+import com.adatafun.airportshop.order.pojo.dto.H5OrderDTO;
 import com.adatafun.airportshop.order.pojo.dto.OrderListQueryParamDTO;
 import com.adatafun.airportshop.order.pojo.dto.SubOrderDTO;
 import com.adatafun.airportshop.order.pojo.po.OrdOrder;
@@ -10,7 +10,13 @@ import com.adatafun.airportshop.order.pojo.po.OrdOrderLanguage;
 import com.adatafun.airportshop.order.pojo.po.OrdSubOrder;
 import com.adatafun.airportshop.order.pojo.vo.OrderDetailVO;
 import com.adatafun.airportshop.order.pojo.vo.OrderItemVO;
+import com.adatafun.airportshop.order.pojo.vo.OrderListExportResultVO;
 import com.adatafun.airportshop.order.service.OrderService;
+import com.adatafun.airportshop.order.service.rpc.MemberUserService;
+import com.adatafun.common.springthrift.annotation.RequestBody;
+import com.adatafun.common.springthrift.annotation.RequestMapping;
+import com.adatafun.common.springthrift.annotation.RequestParam;
+import com.adatafun.common.springthrift.annotation.ThriftRequest;
 import com.adatafun.utils.api.ResUtils;
 import com.adatafun.utils.api.Result;
 import com.adatafun.utils.common.StringUtils;
@@ -19,6 +25,7 @@ import com.adatafun.utils.mybatis.common.ResponsePage;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Controller;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,10 +34,12 @@ import java.util.List;
  * desc :
  * Created by Lin on 2017/11/9.
  */
-@Component
+@Controller
 public class BackgroundOrderController {
     @Autowired
     private OrderService orderService;
+    @Autowired
+    private MemberUserService memberUserService;
 
     /**
      * 下单
@@ -38,9 +47,8 @@ public class BackgroundOrderController {
      * @param request
      * @return
      */
-    @ApiPath(value = "pos/addOrder")
-    public String addOrder(JSONObject request) {
-        BackgroundOrderDTO orderInfo = request.toJavaObject(BackgroundOrderDTO.class);
+    @RequestMapping(value = "pos/addOrder")
+    public String addOrder(@ThriftRequest JSONObject request, @RequestBody BackgroundOrderDTO orderInfo) {
 
         //校验参数
         String message = getCheckParamMsg(orderInfo);
@@ -49,16 +57,17 @@ public class BackgroundOrderController {
         }
 
         //获得操作人信息
-        JSONObject userInfo = new JSONObject();
+        JSONObject userInfo = memberUserService.getMemberUserByUserId("");
 
         //主订单信息
         OrdOrder ordOrder = new OrdOrder();
         ordOrder.setCashierId(orderInfo.getCashierId());
         ordOrder.setEnterpriseId(orderInfo.getEnterpriseId());
         ordOrder.setStoreId(orderInfo.getStoreId());
-        ordOrder.setDestNumber(orderInfo.getDestNumber());
+        ordOrder.setDeskNumber(orderInfo.getDeskNumber());
         ordOrder.setUseNumber(orderInfo.getUseNumber());
         ordOrder.setSubOrderNumber(orderInfo.getSubOrderNumber());
+        ordOrder.setOrderChannel(ChannelType.POS.value());
         //操作人姓名
         //to do
 
@@ -104,15 +113,30 @@ public class BackgroundOrderController {
     /**
      * 订单详情
      *
+     * @param
+     * @return
+     */
+    @RequestMapping(value = "background/orderDetail")
+    public String orderDetail(@RequestParam(name = "orderId") String orderId, @RequestParam(name = "language") String language) {
+        OrderDetailVO orderDetailVO = orderService.orderDetail(orderId, language);
+        return JSONObject.toJSONString(ResUtils.result(orderDetailVO));
+    }
+
+
+    /**
+     * 订单列表
+     *
      * @param request
      * @return
      */
-    @ApiPath(value = "background/orderDetail")
-    public String orderDetail(JSONObject request) {
-        String orderId = request.getString("orderId");
-        String language = request.getString("language");
-        OrderDetailVO orderDetailVO = orderService.orderDetail(orderId, language);
-        return JSONObject.toJSONString(ResUtils.result(orderDetailVO));
+    @RequestMapping(value = "background/orderList")
+    public String orderList(@ThriftRequest JSONObject request) {
+        OrderListQueryParamDTO queryParam = request.toJavaObject(OrderListQueryParamDTO.class);
+
+        ResponsePage<List<OrderItemVO>> responsePage = orderService.orderListByPage(queryParam);
+
+
+        return JSONObject.toJSONString(ResUtils.result(responsePage));
     }
 
 
@@ -122,8 +146,8 @@ public class BackgroundOrderController {
      * @param request
      * @return
      */
-    @ApiPath(value = "background/orderList")
-    public String orderList(JSONObject request) {
+    @RequestMapping(value = "pos/orderList")
+    public String posOrderList(@ThriftRequest JSONObject request) {
         OrderListQueryParamDTO queryParam = request.toJavaObject(OrderListQueryParamDTO.class);
 
         ResponsePage<List<OrderItemVO>> responsePage = orderService.orderListByPage(queryParam);
@@ -133,13 +157,25 @@ public class BackgroundOrderController {
     }
 
     /**
+     * 订单详情
+     *
+     * @param
+     * @return
+     */
+    @RequestMapping(value = "pos/orderDetail")
+    public String posOrderDetail(@RequestParam(name = "orderId") String orderId, @RequestParam(name = "language") String language) {
+        OrderDetailVO orderDetailVO = orderService.orderDetail(orderId, language);
+        return JSONObject.toJSONString(ResUtils.result(orderDetailVO));
+    }
+
+    /**
      * 商家添加备注
      *
      * @param request
      * @return
      */
-    @ApiPath(value = "order/addRemarks")
-    public String addRemark(JSONObject request) {
+    @RequestMapping(value = "order/addRemarks")
+    public String addRemark(@ThriftRequest JSONObject request) {
         String language = request.getString("language");
         String orderId = request.getString("orderId");
         String remarks = request.getString("remarks");
@@ -151,30 +187,50 @@ public class BackgroundOrderController {
         }
 
         orderService.addStoreRemarks(orderId, remarks, language, null);
-        return JSONObject.toJSONString(ResUtils.result(Result.STATUS.SUCCESS));
+        return JSONObject.toJSONString(ResUtils.result(Result.STATUS.SUCCESS.getStatus(), "备注成功"));
     }
 
-    @ApiPath("background/notifyGetFood")
-    public String notifyGetFood(JSONObject request) {
+    @RequestMapping("background/notifyGetFood")
+    public String notifyGetFood(@ThriftRequest JSONObject request) {
 
         String orderId = request.getString("orderId");
-        orderService.notifyGetFood(orderId, null);
+        Result result = orderService.notifyGetFood(orderId, null);
 
-
-        return JSONObject.toJSONString(ResUtils.result(Result.STATUS.SUCCESS));
+        return JSONObject.toJSONString(result);
     }
 
     /**
-     * @param request
+     * @param orderId
      * @return
      */
-    @ApiPath(value = "pos/cancelOrder")
-    public String cancelOrder(JSONObject request) {
+    @RequestMapping(value = "pos/cancelOrder")
+    public String cancelOrder(@RequestParam(name = "orderId") String orderId) {
         String operatorId = null;
-        String orderId = request.getString("orderIds");
         List<String> orderIds = new ArrayList<>();
         orderIds.add(orderId);
         Result result = orderService.orderCancel(orderIds, ChannelType.POS, operatorId);
         return JSONObject.toJSONString(result);
+    }
+
+    /**
+     * @param orderId
+     * @return
+     */
+    @RequestMapping(value = "background/cancelOrder")
+    public String backgroundCancelOrder(@RequestParam(name = "orderId") String orderId) {
+        String operatorId = null;
+        List<String> orderIds = new ArrayList<>();
+        orderIds.add(orderId);
+        Result result = orderService.orderCancel(orderIds, ChannelType.POS, operatorId);
+        return JSONObject.toJSONString(result);
+    }
+
+    @RequestMapping(value = "background/orderExport")
+    public String orderExport(@ThriftRequest JSONObject request) {
+        OrderListQueryParamDTO queryParam = request.toJavaObject(OrderListQueryParamDTO.class);
+
+        List<OrderListExportResultVO> list = orderService.queryOrderListForExport(queryParam);
+
+        return JSONObject.toJSONString(ResUtils.result(list));
     }
 }

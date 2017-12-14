@@ -36,12 +36,12 @@
 
 		<!-- 为哪些表生成代码 tableName:表名 schema:不用填写 -->
 
-	 	<table schema="" tableName="ord_sub_order" domainObjectName="OrdSubOrder" enableCountByExample="false"
+	 	<table schema="" tableName="ord_order" domainObjectName="OrdOrder" enableCountByExample="false"
 				enableUpdateByExample="false" enableDeleteByExample="false"
 				enableSelectByExample="false" selectByExampleQueryId="false">
 		</table>
 
-        <table schema="" tableName="ord_sub_order_language" domainObjectName="OrdSubOrderLanguage" enableCountByExample="false"
+        <!--<table schema="" tableName="ord_sub_order_language" domainObjectName="OrdSubOrderLanguage" enableCountByExample="false"
                enableUpdateByExample="false" enableDeleteByExample="false"
                enableSelectByExample="false" selectByExampleQueryId="false">
         </table>
@@ -60,7 +60,7 @@
         <table schema="" tableName="ord_bill" domainObjectName="OrdBill" enableCountByExample="false"
                enableUpdateByExample="false" enableDeleteByExample="false"
                enableSelectByExample="false" selectByExampleQueryId="false">
-        </table>
+        </table>-->
 
 
 

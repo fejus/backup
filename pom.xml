@@ -3,10 +3,8 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.adatafun.airportshop</groupId>
     <artifactId>order-service</artifactId>
-    <packaging>jar</packaging>
     <version>1.0-SNAPSHOT</version>
     <name>order-service</name>
-    <url>http://maven.apache.org</url>
 
     <properties>
         <encoding>UTF-8</encoding>
@@ -30,6 +28,7 @@
         <ons-lient.version>1.2.1</ons-lient.version>
         <logback.version>1.2.3</logback.version>
         <mybatis-generator.version>1.3.5</mybatis-generator.version>
+        <spring-thrift.version>1.1</spring-thrift.version>
     </properties>
 
     <dependencies>
@@ -54,7 +53,7 @@
         <dependency>
             <groupId>com.adatafun.utils</groupId>
             <artifactId>adatafun-utils</artifactId>
-            <version>1.0.3</version>
+            <version>1.0.6</version>
         </dependency>
 
         <!-- test-config-center -->
@@ -153,29 +152,9 @@
 
         <!-- service 公共类 -->
         <dependency>
-            <groupId>org.apache.thrift</groupId>
-            <artifactId>libthrift</artifactId>
-            <version>${libthrift.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.wyun.utils</groupId>
-            <artifactId>utils</artifactId>
-            <version>${thrift.util.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.wyun.thrift</groupId>
-            <artifactId>server</artifactId>
-            <version>${thrift.server.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.wyun.thrift</groupId>
-            <artifactId>client</artifactId>
-            <version>${thrift.client.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-pool</groupId>
-            <artifactId>commons-pool</artifactId>
-            <version>${commons-pool.version}</version>
+            <groupId>com.adatafun.common</groupId>
+            <artifactId>spring-thrift</artifactId>
+            <version>${spring-thrift.version}</version>
         </dependency>
 
         <dependency>
@@ -194,21 +173,11 @@
             <version>${jedis.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.aliyun.openservices</groupId>
-            <artifactId>ons-client</artifactId>
-            <version>${ons-lient.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-test</artifactId>
-            <version>4.2.0.RELEASE</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.mybatis.generator</groupId>
             <artifactId>mybatis-generator-core</artifactId>
             <version>${mybatis-generator.version}</version>
         </dependency>
+
 
     </dependencies>
 

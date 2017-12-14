@@ -18,6 +18,8 @@ public class OrderListQueryParamDTO extends Page {
     private String channelType;//渠道
     private String orderTimeStart;//下单时间
     private String orderTimeEnd;//下单时间
+    private String comboCondition;//组合条件
+    private String orderNo;//订单编号
 
 
     public String getLanguage() {
@@ -106,5 +108,21 @@ public class OrderListQueryParamDTO extends Page {
 
     public void setOrderTimeEnd(String orderTimeEnd) {
         this.orderTimeEnd = orderTimeEnd;
+    }
+
+    public String getComboCondition() {
+        return comboCondition;
+    }
+
+    public void setComboCondition(String comboCondition) {
+        this.comboCondition = comboCondition;
+    }
+
+    public String getOrderNo() {
+        return orderNo;
+    }
+
+    public void setOrderNo(String orderNo) {
+        this.orderNo = orderNo;
     }
 }

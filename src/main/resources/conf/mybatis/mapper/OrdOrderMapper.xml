@@ -3,6 +3,7 @@
 <mapper namespace="com.adatafun.airportshop.order.mapper.OrdOrderMapper">
     <resultMap id="BaseResultMap" type="com.adatafun.airportshop.order.pojo.po.OrdOrder">
         <id column="order_id" jdbcType="VARCHAR" property="orderId"/>
+        <result column="order_channel" jdbcType="VARCHAR" property="orderChannel"/>
         <result column="order_no" jdbcType="VARCHAR" property="orderNo"/>
         <result column="enterprise_id" jdbcType="VARCHAR" property="enterpriseId"/>
         <result column="store_id" jdbcType="VARCHAR" property="storeId"/>
@@ -14,8 +15,7 @@
         <result column="order_status" jdbcType="VARCHAR" property="orderStatus"/>
         <result column="sub_order_number" jdbcType="INTEGER" property="subOrderNumber"/>
         <result column="use_number" jdbcType="INTEGER" property="useNumber"/>
-        <result column="dest_number" jdbcType="VARCHAR" property="destNumber"/>
-        <result column="order_channel" jdbcType="VARCHAR" property="orderChannel"/>
+        <result column="desk_number" jdbcType="VARCHAR" property="deskNumber"/>
         <result column="order_amount" jdbcType="INTEGER" property="orderAmount"/>
         <result column="actual_amount" jdbcType="INTEGER" property="actualAmount"/>
         <result column="pay_type" jdbcType="VARCHAR" property="payType"/>
@@ -24,67 +24,22 @@
         <result column="pay_status" jdbcType="VARCHAR" property="payStatus"/>
         <result column="language" jdbcType="VARCHAR" property="language"/>
         <result column="airport_code" jdbcType="VARCHAR" property="airportCode"/>
+        <result column="form_id" jdbcType="VARCHAR" property="formId"/>
+        <result column="get_food_number" jdbcType="VARCHAR" property="getFoodNumber"/>
+        <result column="notify_status" jdbcType="INTEGER" property="notifyStatus"/>
+        <result column="notify_read_status" jdbcType="INTEGER" property="notifyReadStatus"/>
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
         <result column="create_user" jdbcType="VARCHAR" property="createUser"/>
         <result column="update_user" jdbcType="VARCHAR" property="updateUser"/>
         <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
         <result column="is_deleted" jdbcType="INTEGER" property="isDeleted"/>
     </resultMap>
-
-    <resultMap id="OrderItemResultMap" type="com.adatafun.airportshop.order.pojo.vo.OrderItemVO"
-               extends="BaseResultMap">
-
-        <result column="enterprise_name" jdbcType="VARCHAR" property="enterpriseName"/>
-        <result column="store_name" jdbcType="VARCHAR" property="storeName"/>
-        <result column="remarks" jdbcType="VARCHAR" property="remarks"/>
-        <result column="store_remarks" jdbcType="VARCHAR" property="storeRemarks"/>
-
-        <collection property="subOrderProList" ofType="com.adatafun.airportshop.order.pojo.vo.SubOrderDetailVO">
-            <id column="sub_order_id" jdbcType="VARCHAR" property="subOrderId"/>
-            <result column="product_id" jdbcType="VARCHAR" property="productId"/>
-            <result column="specification_id" jdbcType="VARCHAR" property="specificationId"/>
-            <result column="product_number" jdbcType="INTEGER" property="productNumber"/>
-            <result column="product_img" jdbcType="VARCHAR" property="productImg"/>
-            <result column="unit_price" jdbcType="INTEGER" property="unitPrice"/>
-            <result column="total_price" jdbcType="INTEGER" property="totalPrice"/>
-            <result column="product_name" jdbcType="VARCHAR" property="productName"/>
-            <result column="specification_name" jdbcType="VARCHAR" property="specificationName"/>
-        </collection>
-    </resultMap>
-
-    <resultMap id="OrderDetailResultMap" type="com.adatafun.airportshop.order.pojo.vo.OrderDetailVO"
-               extends="BaseResultMap">
-
-        <result column="enterprise_name" jdbcType="VARCHAR" property="enterpriseName"/>
-        <result column="store_name" jdbcType="VARCHAR" property="storeName"/>
-        <result column="remarks" jdbcType="VARCHAR" property="remarks"/>
-        <result column="store_remarks" jdbcType="VARCHAR" property="storeRemarks"/>
-
-        <association property="billInfo" javaType="com.adatafun.airportshop.order.pojo.vo.BillInfoVO">
-            <result column="bill_type" jdbcType="VARCHAR" property="billType"/>
-            <result column="company_name" jdbcType="VARCHAR" property="companyName"/>
-            <result column="tax_number" jdbcType="VARCHAR" property="taxNumber"/>
-            <result column="person_name" jdbcType="VARCHAR" property="personName"/>
-        </association>
-
-        <collection property="subOrderProList" ofType="com.adatafun.airportshop.order.pojo.vo.SubOrderDetailVO">
-            <id column="sub_order_id" jdbcType="VARCHAR" property="subOrderId"/>
-            <result column="product_id" jdbcType="VARCHAR" property="productId"/>
-            <result column="specification_id" jdbcType="VARCHAR" property="specificationId"/>
-            <result column="product_number" jdbcType="INTEGER" property="productNumber"/>
-            <result column="product_img" jdbcType="VARCHAR" property="productImg"/>
-            <result column="unit_price" jdbcType="INTEGER" property="unitPrice"/>
-            <result column="total_price" jdbcType="INTEGER" property="totalPrice"/>
-            <result column="product_name" jdbcType="VARCHAR" property="productName"/>
-            <result column="specification_name" jdbcType="VARCHAR" property="specificationName"/>
-        </collection>
-
-    </resultMap>
     <sql id="Base_Column_List">
-    order_id, order_no, enterprise_id, store_id, cashier_id, cashier_name, client_id, 
-    client_mobile, client_name, order_status, sub_order_number, use_number, dest_number, 
-    order_channel, order_amount, actual_amount, pay_type, pay_time, pay_no, pay_status, 
-    language, airport_code, create_time, create_user, update_user, update_time, is_deleted
+    order_id, order_channel, order_no, enterprise_id, store_id, cashier_id, cashier_name, 
+    client_id, client_mobile, client_name, order_status, sub_order_number, use_number, 
+    desk_number, order_amount, actual_amount, pay_type, pay_time, pay_no, pay_status, 
+    language, airport_code, form_id, get_food_number, notify_status, notify_read_status, 
+    create_time, create_user, update_user, update_time, is_deleted
   </sql>
     <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
         select
@@ -97,32 +52,37 @@
     where order_id = #{orderId,jdbcType=VARCHAR}
   </delete>
     <insert id="insert" parameterType="com.adatafun.airportshop.order.pojo.po.OrdOrder">
-    insert into ord_order (order_id, order_no, enterprise_id, 
-      store_id, cashier_id, cashier_name, 
-      client_id, client_mobile, client_name, 
-      order_status, sub_order_number, use_number, 
-      dest_number, order_channel, order_amount, 
+    insert into ord_order (order_id, order_channel, order_no, 
+      enterprise_id, store_id, cashier_id, 
+      cashier_name, client_id, client_mobile, 
+      client_name, order_status, sub_order_number, 
+      use_number, desk_number, order_amount, 
       actual_amount, pay_type, pay_time, 
       pay_no, pay_status, language, 
-      airport_code, create_time, create_user, 
-      update_user, update_time, is_deleted
-      )
-    values (#{orderId,jdbcType=VARCHAR}, #{orderNo,jdbcType=VARCHAR}, #{enterpriseId,jdbcType=VARCHAR}, 
-      #{storeId,jdbcType=VARCHAR}, #{cashierId,jdbcType=VARCHAR}, #{cashierName,jdbcType=VARCHAR}, 
-      #{clientId,jdbcType=VARCHAR}, #{clientMobile,jdbcType=VARCHAR}, #{clientName,jdbcType=VARCHAR}, 
-      #{orderStatus,jdbcType=VARCHAR}, #{subOrderNumber,jdbcType=INTEGER}, #{useNumber,jdbcType=INTEGER},
-      #{destNumber,jdbcType=VARCHAR}, #{orderChannel,jdbcType=VARCHAR}, #{orderAmount,jdbcType=INTEGER}, 
+      airport_code, form_id, get_food_number, 
+      notify_status, notify_read_status, create_time, 
+      create_user, update_user, update_time, 
+      is_deleted)
+    values (#{orderId,jdbcType=VARCHAR}, #{orderChannel,jdbcType=VARCHAR}, #{orderNo,jdbcType=VARCHAR}, 
+      #{enterpriseId,jdbcType=VARCHAR}, #{storeId,jdbcType=VARCHAR}, #{cashierId,jdbcType=VARCHAR}, 
+      #{cashierName,jdbcType=VARCHAR}, #{clientId,jdbcType=VARCHAR}, #{clientMobile,jdbcType=VARCHAR}, 
+      #{clientName,jdbcType=VARCHAR}, #{orderStatus,jdbcType=VARCHAR}, #{subOrderNumber,jdbcType=INTEGER}, 
+      #{useNumber,jdbcType=INTEGER}, #{deskNumber,jdbcType=VARCHAR}, #{orderAmount,jdbcType=INTEGER}, 
       #{actualAmount,jdbcType=INTEGER}, #{payType,jdbcType=VARCHAR}, #{payTime,jdbcType=TIMESTAMP}, 
       #{payNo,jdbcType=VARCHAR}, #{payStatus,jdbcType=VARCHAR}, #{language,jdbcType=VARCHAR}, 
-      #{airportCode,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{createUser,jdbcType=VARCHAR}, 
-      #{updateUser,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP}, #{isDeleted,jdbcType=INTEGER}
-      )
+      #{airportCode,jdbcType=VARCHAR}, #{formId,jdbcType=VARCHAR}, #{getFoodNumber,jdbcType=VARCHAR}, 
+      #{notifyStatus,jdbcType=INTEGER}, #{notifyReadStatus,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{createUser,jdbcType=VARCHAR}, #{updateUser,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP}, 
+      #{isDeleted,jdbcType=INTEGER})
   </insert>
     <insert id="insertSelective" parameterType="com.adatafun.airportshop.order.pojo.po.OrdOrder">
         insert into ord_order
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="orderId != null">
                 order_id,
+            </if>
+            <if test="orderChannel != null">
+                order_channel,
             </if>
             <if test="orderNo != null">
                 order_no,
@@ -157,11 +117,8 @@
             <if test="useNumber != null">
                 use_number,
             </if>
-            <if test="destNumber != null">
-                dest_number,
-            </if>
-            <if test="orderChannel != null">
-                order_channel,
+            <if test="deskNumber != null">
+                desk_number,
             </if>
             <if test="orderAmount != null">
                 order_amount,
@@ -187,6 +144,18 @@
             <if test="airportCode != null">
                 airport_code,
             </if>
+            <if test="formId != null">
+                form_id,
+            </if>
+            <if test="getFoodNumber != null">
+                get_food_number,
+            </if>
+            <if test="notifyStatus != null">
+                notify_status,
+            </if>
+            <if test="notifyReadStatus != null">
+                notify_read_status,
+            </if>
             <if test="createTime != null">
                 create_time,
             </if>
@@ -206,6 +175,9 @@
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="orderId != null">
                 #{orderId,jdbcType=VARCHAR},
+            </if>
+            <if test="orderChannel != null">
+                #{orderChannel,jdbcType=VARCHAR},
             </if>
             <if test="orderNo != null">
                 #{orderNo,jdbcType=VARCHAR},
@@ -240,11 +212,8 @@
             <if test="useNumber != null">
                 #{useNumber,jdbcType=INTEGER},
             </if>
-            <if test="destNumber != null">
-                #{destNumber,jdbcType=VARCHAR},
-            </if>
-            <if test="orderChannel != null">
-                #{orderChannel,jdbcType=VARCHAR},
+            <if test="deskNumber != null">
+                #{deskNumber,jdbcType=VARCHAR},
             </if>
             <if test="orderAmount != null">
                 #{orderAmount,jdbcType=INTEGER},
@@ -270,6 +239,18 @@
             <if test="airportCode != null">
                 #{airportCode,jdbcType=VARCHAR},
             </if>
+            <if test="formId != null">
+                #{formId,jdbcType=VARCHAR},
+            </if>
+            <if test="getFoodNumber != null">
+                #{getFoodNumber,jdbcType=VARCHAR},
+            </if>
+            <if test="notifyStatus != null">
+                #{notifyStatus,jdbcType=INTEGER},
+            </if>
+            <if test="notifyReadStatus != null">
+                #{notifyReadStatus,jdbcType=INTEGER},
+            </if>
             <if test="createTime != null">
                 #{createTime,jdbcType=TIMESTAMP},
             </if>
@@ -290,6 +271,9 @@
     <update id="updateByPrimaryKeySelective" parameterType="com.adatafun.airportshop.order.pojo.po.OrdOrder">
         update ord_order
         <set>
+            <if test="orderChannel != null">
+                order_channel = #{orderChannel,jdbcType=VARCHAR},
+            </if>
             <if test="orderNo != null">
                 order_no = #{orderNo,jdbcType=VARCHAR},
             </if>
@@ -323,11 +307,8 @@
             <if test="useNumber != null">
                 use_number = #{useNumber,jdbcType=INTEGER},
             </if>
-            <if test="destNumber != null">
-                dest_number = #{destNumber,jdbcType=VARCHAR},
-            </if>
-            <if test="orderChannel != null">
-                order_channel = #{orderChannel,jdbcType=VARCHAR},
+            <if test="deskNumber != null">
+                desk_number = #{deskNumber,jdbcType=VARCHAR},
             </if>
             <if test="orderAmount != null">
                 order_amount = #{orderAmount,jdbcType=INTEGER},
@@ -353,6 +334,18 @@
             <if test="airportCode != null">
                 airport_code = #{airportCode,jdbcType=VARCHAR},
             </if>
+            <if test="formId != null">
+                form_id = #{formId,jdbcType=VARCHAR},
+            </if>
+            <if test="getFoodNumber != null">
+                get_food_number = #{getFoodNumber,jdbcType=VARCHAR},
+            </if>
+            <if test="notifyStatus != null">
+                notify_status = #{notifyStatus,jdbcType=INTEGER},
+            </if>
+            <if test="notifyReadStatus != null">
+                notify_read_status = #{notifyReadStatus,jdbcType=INTEGER},
+            </if>
             <if test="createTime != null">
                 create_time = #{createTime,jdbcType=TIMESTAMP},
             </if>
@@ -373,7 +366,8 @@
     </update>
     <update id="updateByPrimaryKey" parameterType="com.adatafun.airportshop.order.pojo.po.OrdOrder">
     update ord_order
-    set order_no = #{orderNo,jdbcType=VARCHAR},
+    set order_channel = #{orderChannel,jdbcType=VARCHAR},
+      order_no = #{orderNo,jdbcType=VARCHAR},
       enterprise_id = #{enterpriseId,jdbcType=VARCHAR},
       store_id = #{storeId,jdbcType=VARCHAR},
       cashier_id = #{cashierId,jdbcType=VARCHAR},
@@ -384,8 +378,7 @@
       order_status = #{orderStatus,jdbcType=VARCHAR},
       sub_order_number = #{subOrderNumber,jdbcType=INTEGER},
       use_number = #{useNumber,jdbcType=INTEGER},
-      dest_number = #{destNumber,jdbcType=VARCHAR},
-      order_channel = #{orderChannel,jdbcType=VARCHAR},
+      desk_number = #{deskNumber,jdbcType=VARCHAR},
       order_amount = #{orderAmount,jdbcType=INTEGER},
       actual_amount = #{actualAmount,jdbcType=INTEGER},
       pay_type = #{payType,jdbcType=VARCHAR},
@@ -394,6 +387,10 @@
       pay_status = #{payStatus,jdbcType=VARCHAR},
       language = #{language,jdbcType=VARCHAR},
       airport_code = #{airportCode,jdbcType=VARCHAR},
+      form_id = #{formId,jdbcType=VARCHAR},
+      get_food_number = #{getFoodNumber,jdbcType=VARCHAR},
+      notify_status = #{notifyStatus,jdbcType=INTEGER},
+      notify_read_status = #{notifyReadStatus,jdbcType=INTEGER},
       create_time = #{createTime,jdbcType=TIMESTAMP},
       create_user = #{createUser,jdbcType=VARCHAR},
       update_user = #{updateUser,jdbcType=VARCHAR},
@@ -401,11 +398,108 @@
       is_deleted = #{isDeleted,jdbcType=INTEGER}
     where order_id = #{orderId,jdbcType=VARCHAR}
   </update>
+    <resultMap id="OrderItemResultMap" type="com.adatafun.airportshop.order.pojo.vo.OrderItemVO">
 
+        <result column="enterprise_name" jdbcType="VARCHAR" property="enterpriseName"/>
+        <result column="store_name" jdbcType="VARCHAR" property="storeName"/>
+        <result column="remarks" jdbcType="VARCHAR" property="remarks"/>
+        <result column="store_remarks" jdbcType="VARCHAR" property="storeRemarks"/>
+        <result column="order_id" jdbcType="VARCHAR" property="orderId"/>
+        <result column="order_channel" jdbcType="VARCHAR" property="orderChannel"/>
+        <result column="order_no" jdbcType="VARCHAR" property="orderNo"/>
+        <result column="enterprise_id" jdbcType="VARCHAR" property="enterpriseId"/>
+        <result column="store_id" jdbcType="VARCHAR" property="storeId"/>
+        <result column="cashier_id" jdbcType="VARCHAR" property="cashierId"/>
+        <result column="cashier_name" jdbcType="VARCHAR" property="cashierName"/>
+        <result column="client_id" jdbcType="VARCHAR" property="clientId"/>
+        <result column="client_mobile" jdbcType="VARCHAR" property="clientMobile"/>
+        <result column="client_name" jdbcType="VARCHAR" property="clientName"/>
+        <result column="order_status" jdbcType="VARCHAR" property="orderStatus"/>
+        <result column="sub_order_number" jdbcType="INTEGER" property="subOrderNumber"/>
+        <result column="use_number" jdbcType="INTEGER" property="useNumber"/>
+        <result column="desk_number" jdbcType="VARCHAR" property="deskNumber"/>
+        <result column="order_amount" jdbcType="INTEGER" property="orderAmount"/>
+        <result column="actual_amount" jdbcType="INTEGER" property="actualAmount"/>
+        <result column="pay_type" jdbcType="VARCHAR" property="payType"/>
+        <result column="pay_time" jdbcType="TIMESTAMP" property="payTime"/>
+        <result column="pay_no" jdbcType="VARCHAR" property="payNo"/>
+        <result column="pay_status" jdbcType="VARCHAR" property="payStatus"/>
+        <result column="language" jdbcType="VARCHAR" property="language"/>
+        <result column="get_food_number" jdbcType="VARCHAR" property="getFoodNumber"/>
+        <result column="notify_status" jdbcType="INTEGER" property="notifyStatus"/>
+        <result column="notify_read_status" jdbcType="INTEGER" property="notifyReadStatus"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
 
+        <collection property="subOrderProList" ofType="com.adatafun.airportshop.order.pojo.vo.SubOrderDetailVO">
+            <id column="sub_order_id" jdbcType="VARCHAR" property="subOrderId"/>
+            <result column="product_id" jdbcType="VARCHAR" property="productId"/>
+            <result column="specification_id" jdbcType="VARCHAR" property="specificationId"/>
+            <result column="product_number" jdbcType="INTEGER" property="productNumber"/>
+            <result column="product_img" jdbcType="VARCHAR" property="productImg"/>
+            <result column="unit_price" jdbcType="INTEGER" property="unitPrice"/>
+            <result column="total_price" jdbcType="INTEGER" property="totalPrice"/>
+            <result column="product_name" jdbcType="VARCHAR" property="productName"/>
+            <result column="specification_name" jdbcType="VARCHAR" property="specificationName"/>
+        </collection>
+    </resultMap>
+
+    <resultMap id="OrderDetailResultMap" type="com.adatafun.airportshop.order.pojo.vo.OrderDetailVO"
+              >
+
+        <result column="enterprise_name" jdbcType="VARCHAR" property="enterpriseName"/>
+        <result column="store_name" jdbcType="VARCHAR" property="storeName"/>
+        <result column="remarks" jdbcType="VARCHAR" property="remarks"/>
+        <result column="store_remarks" jdbcType="VARCHAR" property="storeRemarks"/>
+        <result column="order_id" jdbcType="VARCHAR" property="orderId"/>
+        <result column="order_channel" jdbcType="VARCHAR" property="orderChannel"/>
+        <result column="order_no" jdbcType="VARCHAR" property="orderNo"/>
+        <result column="enterprise_id" jdbcType="VARCHAR" property="enterpriseId"/>
+        <result column="store_id" jdbcType="VARCHAR" property="storeId"/>
+        <result column="cashier_id" jdbcType="VARCHAR" property="cashierId"/>
+        <result column="cashier_name" jdbcType="VARCHAR" property="cashierName"/>
+        <result column="client_id" jdbcType="VARCHAR" property="clientId"/>
+        <result column="client_mobile" jdbcType="VARCHAR" property="clientMobile"/>
+        <result column="client_name" jdbcType="VARCHAR" property="clientName"/>
+        <result column="order_status" jdbcType="VARCHAR" property="orderStatus"/>
+        <result column="sub_order_number" jdbcType="INTEGER" property="subOrderNumber"/>
+        <result column="use_number" jdbcType="INTEGER" property="useNumber"/>
+        <result column="desk_number" jdbcType="VARCHAR" property="deskNumber"/>
+        <result column="order_amount" jdbcType="INTEGER" property="orderAmount"/>
+        <result column="actual_amount" jdbcType="INTEGER" property="actualAmount"/>
+        <result column="pay_type" jdbcType="VARCHAR" property="payType"/>
+        <result column="pay_time" jdbcType="TIMESTAMP" property="payTime"/>
+        <result column="pay_no" jdbcType="VARCHAR" property="payNo"/>
+        <result column="pay_status" jdbcType="VARCHAR" property="payStatus"/>
+        <result column="language" jdbcType="VARCHAR" property="language"/>
+        <result column="get_food_number" jdbcType="VARCHAR" property="getFoodNumber"/>
+        <result column="notify_status" jdbcType="INTEGER" property="notifyStatus"/>
+        <result column="notify_read_status" jdbcType="INTEGER" property="notifyReadStatus"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+
+        <association property="billInfo" javaType="com.adatafun.airportshop.order.pojo.vo.BillInfoVO">
+            <result column="bill_type" jdbcType="VARCHAR" property="billType"/>
+            <result column="company_name" jdbcType="VARCHAR" property="companyName"/>
+            <result column="tax_number" jdbcType="VARCHAR" property="taxNumber"/>
+            <result column="person_name" jdbcType="VARCHAR" property="personName"/>
+        </association>
+
+        <collection property="subOrderProList" ofType="com.adatafun.airportshop.order.pojo.vo.SubOrderDetailVO">
+            <id column="sub_order_id" jdbcType="VARCHAR" property="subOrderId"/>
+            <result column="product_id" jdbcType="VARCHAR" property="productId"/>
+            <result column="specification_id" jdbcType="VARCHAR" property="specificationId"/>
+            <result column="product_number" jdbcType="INTEGER" property="productNumber"/>
+            <result column="product_img" jdbcType="VARCHAR" property="productImg"/>
+            <result column="unit_price" jdbcType="INTEGER" property="unitPrice"/>
+            <result column="total_price" jdbcType="INTEGER" property="totalPrice"/>
+            <result column="product_name" jdbcType="VARCHAR" property="productName"/>
+            <result column="specification_name" jdbcType="VARCHAR" property="specificationName"/>
+        </collection>
+
+    </resultMap>
     <select id="selectOrderDetailByOrderId" parameterType="java.lang.String" resultMap="OrderDetailResultMap">
-        SELECT
-        ool.order_id,
+       SELECT
+        oo.order_id,
+        oo.order_channel,
         oo.order_no,
         oo.create_time,
         oo.client_id,
@@ -415,7 +509,7 @@
         oo.store_id,
         oo.order_status,
         oo.pay_status,
-        oo.dest_number,
+        oo.desk_number,
         oo.use_number,
         oo.sub_order_number,
         oo.order_amount,
@@ -423,7 +517,10 @@
         oo.pay_type,
         oo.pay_no,
         oo.pay_time,
-        ool.enterprise_name,
+        oo.form_id,
+        oo.get_food_number,
+        oo.notify_status,
+		ool.enterprise_name,
         ool.remarks,
         ool.store_remarks,
         ool.store_name,
@@ -446,7 +543,7 @@
         ord_order_language ool ON ool.order_id = oo.order_id
         AND ool.language =  #{language,jdbcType=VARCHAR}
         AND ool.is_deleted = 0
-        JOIN
+        LEFT JOIN
         ord_bill ob ON ob.order_id = oo.order_id
         AND ob.is_deleted = 0
         JOIN
@@ -464,7 +561,8 @@
 
     <select id="selectOrderDetailByOrderNo" parameterType="java.lang.String" resultMap="OrderDetailResultMap">
         SELECT
-        ool.order_id,
+        oo.order_id,
+        oo.order_channel,
         oo.order_no,
         oo.create_time,
         oo.client_id,
@@ -474,7 +572,7 @@
         oo.store_id,
         oo.order_status,
         oo.pay_status,
-        oo.dest_number,
+        oo.desk_number,
         oo.use_number,
         oo.sub_order_number,
         oo.order_amount,
@@ -482,7 +580,10 @@
         oo.pay_type,
         oo.pay_no,
         oo.pay_time,
-        ool.enterprise_name,
+        oo.form_id,
+        oo.get_food_number,
+        oo.notify_status,
+		ool.enterprise_name,
         ool.remarks,
         ool.store_remarks,
         ool.store_name,
@@ -524,7 +625,8 @@
     <select id="selectOrderListByPage" parameterType="com.adatafun.airportshop.order.pojo.dto.OrderListQueryParamDTO"
             resultMap="OrderItemResultMap">
         SELECT
-        ool.order_id,
+        oo.order_id,
+        oo.order_channel,
         oo.order_no,
         oo.create_time,
         oo.client_id,
@@ -534,7 +636,7 @@
         oo.store_id,
         oo.order_status,
         oo.pay_status,
-        oo.dest_number,
+        oo.desk_number,
         oo.use_number,
         oo.sub_order_number,
         oo.order_amount,
@@ -542,6 +644,8 @@
         oo.pay_type,
         oo.pay_no,
         oo.pay_time,
+        oo.notify_status,
+        oo.get_food_number,
         ool.enterprise_name,
         ool.remarks,
         ool.store_remarks,
@@ -570,35 +674,45 @@
         AND osol.is_deleted = 0
         WHERE
         oo.is_deleted = 0
-        <if test="clientId != null">
+        <if test='clientId != null and  clientId != "" '>
             and oo.client_id = #{clientId,jdbcType=VARCHAR}
         </if>
-        <if test="storeId != null">
+        <if test='storeId != null and storeId != "" '>
             and oo.store_id = #{storeId,jdbcType=VARCHAR}
         </if>
-        <if test="enterpriseId != null">
+        <if test='enterpriseId != null and enterpriseId != "" '>
             and oo.enterpriseId = #{enterpriseId,jdbcType=VARCHAR}
         </if>
-        <if test="orderStatus != null">
+        <if test='orderStatus != null and orderStatus != "" '>
             and oo.order_status = #{orderStatus,jdbcType=VARCHAR}
         </if>
-        <if test="payStatus != null">
+        <if test='payStatus != null and payStatus != "" '>
             and oo.pay_status = #{payStatus,jdbcType=VARCHAR}
         </if>
-        <if test="orderId != null">
+        <if test='orderId != null and orderId != "" '>
             and oo.order_id = #{orderId,jdbcType=VARCHAR}
         </if>
-        <if test="clientMobile != null">
+        <if test='orderNo != null and orderNo != "" '>
+            and oo.order_no = #{orderNo,jdbcType=VARCHAR}
+        </if>
+        <if test='clientMobile != null and clientMobile != "" '>
             and oo.client_mobile = #{clientMobile,jdbcType=VARCHAR}
         </if>
-        <if test="channelType != null">
+        <if test='channelType != null and channelType != "" '>
             and oo.channel_type = #{channelType,jdbcType=VARCHAR}
         </if>
-        <if test="orderTimeStart != null">
+        <if test='orderTimeStart != null and orderTimeStart != ""'>
             and oo.create_time >= #{orderTimeStart}
         </if>
-        <if test="orderTimeEnd != null">
+        <if test='orderTimeEnd != null and orderTimeEnd != "" '>
             and oo.create_time &lt; #{orderTimeEnd}
+        </if>
+        <if test='comboCondition != null and comboCondition != "" '>
+            and ( oo.order_no = #{comboCondition,jdbcType=VARCHAR}
+            or oo.get_food_number = #{comboCondition,jdbcType=VARCHAR}
+            or oo.desk_number = #{comboCondition,jdbcType=VARCHAR}
+            or oo.client_mobile = #{comboCondition,jdbcType=VARCHAR}
+            )
         </if>
         order by create_time desc
         limit #{startNumber},#{endNumber}
@@ -608,38 +722,121 @@
             resultType="java.lang.Integer">
         select count(order_id) from ord_order oo
         where oo.is_deleted = 0
-        <if test="clientId != null">
+        <if test='clientId != null and  clientId != "" '>
             and oo.client_id = #{clientId,jdbcType=VARCHAR}
         </if>
-        <if test="storeId != null">
+        <if test='storeId != null and storeId != "" '>
             and oo.store_id = #{storeId,jdbcType=VARCHAR}
         </if>
-        <if test="enterpriseId != null">
+        <if test='enterpriseId != null and enterpriseId != "" '>
             and oo.enterpriseId = #{enterpriseId,jdbcType=VARCHAR}
         </if>
-        <if test="orderStatus != null">
+        <if test='orderStatus != null and orderStatus != "" '>
             and oo.order_status = #{orderStatus,jdbcType=VARCHAR}
         </if>
-        <if test="payStatus != null">
+        <if test='payStatus != null and payStatus != "" '>
             and oo.pay_status = #{payStatus,jdbcType=VARCHAR}
         </if>
-        <if test="orderId != null">
+        <if test='orderId != null and orderId != "" '>
             and oo.order_id = #{orderId,jdbcType=VARCHAR}
         </if>
-        <if test="clientMobile != null">
+        <if test='orderNo != null and orderNo != "" '>
+            and oo.order_no = #{orderNo,jdbcType=VARCHAR}
+        </if>
+        <if test='clientMobile != null and clientMobile != "" '>
             and oo.client_mobile = #{clientMobile,jdbcType=VARCHAR}
         </if>
-        <if test="channelType != null">
+        <if test='channelType != null and channelType != "" '>
             and oo.channel_type = #{channelType,jdbcType=VARCHAR}
         </if>
-        <if test="orderTimeStart != null">
+        <if test='orderTimeStart != null and orderTimeStart != ""'>
             and oo.create_time >= #{orderTimeStart}
         </if>
-        <if test="orderTimeEnd != null">
+        <if test='orderTimeEnd != null and orderTimeEnd != "" '>
             and oo.create_time &lt; #{orderTimeEnd}
         </if>
-
+        <if test='comboCondition != null and comboCondition != "" '>
+            and ( oo.order_no = #{comboCondition,jdbcType=VARCHAR}
+            or oo.get_food_number = #{comboCondition,jdbcType=VARCHAR}
+            or oo.desk_number = #{comboCondition,jdbcType=VARCHAR}
+            or oo.client_mobile = #{comboCondition,jdbcType=VARCHAR}
+            )
+        </if>
 
     </select>
 
+
+    <resultMap id="OrderListExportResultMap" type="com.adatafun.airportshop.order.pojo.vo.OrderListExportResultVO">
+        <result column="store_name" jdbcType="VARCHAR" property="storeName"/>
+        <result column="order_status" jdbcType="VARCHAR" property="orderStatus"/>
+        <result column="order_channel" jdbcType="VARCHAR" property="orderChannel"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="order_amount" jdbcType="INTEGER" property="orderAmount"/>
+        <result column="actual_amount" jdbcType="INTEGER" property="actualAmount"/>
+        <result column="pay_status" jdbcType="VARCHAR" property="payStatus"/>
+        <result column="pay_type" jdbcType="VARCHAR" property="payType"/>
+        <result column="pay_time" jdbcType="TIMESTAMP" property="payTime"/>
+        <result column="remarks" jdbcType="VARCHAR" property="remarks"/>
+        <result column="client_name" jdbcType="VARCHAR" property="clientName"/>
+    </resultMap>
+
+    <select id="selectOrderListForExport" parameterType="com.adatafun.airportshop.order.pojo.dto.OrderListQueryParamDTO"
+            resultMap="OrderListExportResultMap">
+        SELECT
+        ool.store_name,
+        oo.order_no,
+        oo.order_status,
+        oo.order_channel,
+        oo.create_time,
+        oo.order_amount,
+        oo.actual_amount,
+        oo.pay_status,
+        oo.pay_type,
+        oo.pay_time,
+        case when ool.store_remarks is not null then ool.store_remarks
+        else ool.remarks end remarks,
+        oo.client_name
+        FROM
+        ord_order oo
+        JOIN
+        ord_order_language ool ON ool.order_id = oo.order_id
+        AND ool.language = #{language,jdbcType=VARCHAR}
+        AND ool.is_deleted = 0
+        WHERE
+        oo.is_deleted = 0
+        <if test='clientId != null and  clientId != "" '>
+            and oo.client_id = #{clientId,jdbcType=VARCHAR}
+        </if>
+        <if test='storeId != null and storeId != "" '>
+            and oo.store_id = #{storeId,jdbcType=VARCHAR}
+        </if>
+        <if test='enterpriseId != null and enterpriseId != "" '>
+            and oo.enterpriseId = #{enterpriseId,jdbcType=VARCHAR}
+        </if>
+        <if test='orderStatus != null and orderStatus != "" '>
+            and oo.order_status = #{orderStatus,jdbcType=VARCHAR}
+        </if>
+        <if test='payStatus != null and payStatus != "" '>
+            and oo.pay_status = #{payStatus,jdbcType=VARCHAR}
+        </if>
+        <if test='orderId != null and orderId != "" '>
+            and oo.order_id = #{orderId,jdbcType=VARCHAR}
+        </if>
+        <if test='orderNo != null and orderNo != "" '>
+            and oo.order_no = #{orderNo,jdbcType=VARCHAR}
+        </if>
+        <if test='clientMobile != null and clientMobile != "" '>
+            and oo.client_mobile = #{clientMobile,jdbcType=VARCHAR}
+        </if>
+        <if test='channelType != null and channelType != "" '>
+            and oo.channel_type = #{channelType,jdbcType=VARCHAR}
+        </if>
+        <if test='orderTimeStart != null and orderTimeStart != ""'>
+            and oo.create_time >= #{orderTimeStart}
+        </if>
+        <if test='orderTimeEnd != null and orderTimeEnd != "" '>
+            and oo.create_time &lt; #{orderTimeEnd}
+        </if>
+    </select>
 </mapper>
+

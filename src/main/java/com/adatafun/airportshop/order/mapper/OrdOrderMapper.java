@@ -4,6 +4,7 @@ import com.adatafun.airportshop.order.pojo.dto.OrderListQueryParamDTO;
 import com.adatafun.airportshop.order.pojo.po.OrdOrder;
 import com.adatafun.airportshop.order.pojo.vo.OrderDetailVO;
 import com.adatafun.airportshop.order.pojo.vo.OrderItemVO;
+import com.adatafun.airportshop.order.pojo.vo.OrderListExportResultVO;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -30,6 +31,13 @@ public interface OrdOrderMapper {
     List<OrderItemVO> selectOrderListByPage(OrderListQueryParamDTO queryParam);
 
     int countOrder(OrderListQueryParamDTO queryParam);
+
+    /**
+     *  查询订单导出结果
+     * @param queryParam
+     * @return
+     */
+    List<OrderListExportResultVO> selectOrderListForExport(OrderListQueryParamDTO queryParam);
 
 
 }

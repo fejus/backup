@@ -1,6 +1,7 @@
 package com.adatafun.airportshop.order.common.util;
 
 import com.adatafun.airportshop.order.conf.RedisConfig;
+import com.adatafun.utils.common.UUIDUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
@@ -25,9 +26,9 @@ public class RedisUtil {
 
     private static String PSW = "fengshu2017";//密码
 
-    private static int MAX_ACTIVE = 500;//最大连接数量
+    private static int MAX_ACTIVE = 5000;//最大连接数量
 
-    private static int MAX_IDLE = 200;//最小连接数量
+    private static int MAX_IDLE = 2000;//最小连接数量
 
     private static long MAX_WAIT = 10000L;//最大的等待时间
 
@@ -58,7 +59,7 @@ public class RedisUtil {
     private synchronized static void init() {
 
         JedisPoolConfig config = new JedisPoolConfig();
-        ADDR = RedisConfig.host;
+        ADDR = RedisConfig.host != null ? RedisConfig.host : ADDR;
         PORT = RedisConfig.port == 0 ? PORT: RedisConfig.port;
 
         MAX_ACTIVE = RedisConfig.maxActive == 0 ? MAX_ACTIVE : RedisConfig.maxActive;
@@ -138,6 +139,83 @@ public class RedisUtil {
         }
         return result;
     }
+
+
+    /**
+     * set集合里添加值
+     *
+     * @param key    键
+     * @param member 值
+     * @return
+     */
+    public static Long sadd(String key, String member) {
+        Long result = null;
+
+        Jedis jedis = RedisUtil.getJedis();
+        if (jedis == null) {
+            return result;
+        }
+        try {
+            result = jedis.sadd(pre_fix + key, member);
+
+        } catch (Exception e) {
+            logger.error("set集合添加值出错", e);
+        } finally {
+            returnJedis(jedis);
+        }
+        return result;
+    }
+
+    /**
+     * 获得set集合的长度
+     *
+     * @param key 键
+     * @return
+     */
+    public static Long scard(String key) {
+        Long result = null;
+
+        Jedis jedis = RedisUtil.getJedis();
+        if (jedis == null) {
+            return result;
+        }
+        try {
+            result = jedis.scard(pre_fix + key);
+
+        } catch (Exception e) {
+            logger.error("set集合添加值出错", e);
+        } finally {
+            returnJedis(jedis);
+        }
+        return result;
+    }
+
+    /**
+     * 检测set集合里是否存在某个值
+     *
+     * @param key
+     * @param member
+     * @return
+     */
+    public static Boolean sismember(String key, String member) {
+        Boolean result = Boolean.FALSE;
+        Jedis jedis = RedisUtil.getJedis();
+        if (null == jedis) {
+            return result;
+        }
+        try {
+            result = jedis.sismember(pre_fix + key, member);
+        } catch (Exception e) {
+            logger.error("检查是否存在出错：，" + e);
+        } finally {
+            returnJedis(jedis);
+        }
+        return result;
+    }
+
+
+
+
 
 
     /**
@@ -368,6 +446,77 @@ public class RedisUtil {
             return ObjectUtils.serialize(object);
         }
     }
+
+    /**
+     * 获得分布式锁
+     *
+     * @param key
+     * @param timeout
+     * @return
+     */
+    public static String getLock(String key, Integer timeout) {
+        String lockValue = null;
+        Long lock = 0L;
+        Jedis jedis = RedisUtil.getJedis();
+        if (jedis == null) {
+            return lockValue;
+        }
+        try {
+            lockValue = UUIDUtil.getUUID();
+            lock = jedis.setnx(pre_fix + key, lockValue);
+            if (lock!=null && 1 == lock) {
+                jedis.expire(pre_fix + key, timeout);
+            }
+            int tryCount = 0;
+            while (lock!=null && 0 == lock) {
+//                System.out.println("等待锁释放");
+                //等待2秒再次尝试
+                Thread.sleep(2000);
+                lock = jedis.setnx(pre_fix + key, lockValue);
+                tryCount++;
+               // System.out.println(key + "一直占有锁");
+                //System.out.println("第" + tryCount + "尝试");
+            }
+
+        } catch (Exception e) {
+            if (lock!=null && 1 == lock) {
+                logger.error("设置分布式锁出错,释放锁");
+                releaseLock(key, lockValue);
+            }
+            lockValue = null;
+        } finally {
+            returnJedis(jedis);
+        }
+        return lockValue;
+    }
+
+    /**
+     * 释放分布式锁
+     *
+     * @param key
+     * @param value
+     * @return
+     */
+    public static boolean releaseLock(String key, String value) {
+
+        boolean releaseResult = false;
+        Jedis jedis = RedisUtil.getJedis();
+        if (jedis == null) {
+            return releaseResult;
+        }
+        try {
+            if (value.equals(jedis.get(pre_fix + key))) {
+                jedis.del(pre_fix + key);
+            }
+        } catch (Exception e) {
+            logger.error("释放分布式锁出错", e);
+        } finally {
+            returnJedis(jedis);
+        }
+        return releaseResult;
+    }
+
+
 
 
 

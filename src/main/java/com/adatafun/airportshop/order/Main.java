@@ -62,9 +62,9 @@ public class Main {
         context.refresh();
         // thrift server
         Server server = new Server(port);
-        server.startSingleServer((IBusinessService) context.getBean("businessService"),serviceName);
+        server.startSingleServer((IBusinessService) context.getBean("businessService"), serviceName);
         while (true) {
-            System.out.println("order-service service interface start");
+            System.out.println("order-service   interface start");
             Thread.sleep(1000000);
         }
     }

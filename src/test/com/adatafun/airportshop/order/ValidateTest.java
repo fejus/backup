@@ -2,10 +2,14 @@ package com.adatafun.airportshop.order;
 
 import com.adatafun.airportshop.order.pojo.dto.H5OrderDTO;
 import com.adatafun.airportshop.order.pojo.dto.SubOrderDTO;
+import com.adatafun.utils.common.DateUtils;
+import com.adatafun.utils.common.JWTUtil;
 import com.adatafun.utils.data.BeanValidateUtil;
 import org.junit.Test;
 
+import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -28,6 +32,29 @@ public class ValidateTest {
         for (String message : messages) {
             System.out.println(message);
         }
+
+    }
+
+    @Test
+    public void test2() {
+        System.out.println(new Date().getTime() / 1000);
+    }
+
+
+    @Test
+    public void test3() {
+        System.out.println(JWTUtil.createJWT("978dfec70d104eef8e9c2e4879b8b01b", "", 999999999, "adatafun"));
+    }
+
+    @Test
+    public void test4() throws ParseException {
+        System.out.println(new Date().getTime() / 1000);
+        System.out.println((DateUtils.nextDay(DateUtils.getDate("yyyy-MM-dd")).getTime() - new Date().getTime()) / 1000 );
+
+    }
+
+    @Test
+    public void test5(){
 
     }
 }

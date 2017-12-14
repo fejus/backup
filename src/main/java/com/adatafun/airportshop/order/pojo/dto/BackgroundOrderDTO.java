@@ -19,7 +19,7 @@ public class BackgroundOrderDTO {
     @NotNull(message = "无门店标识")
     private String storeId;//门店编码
     @NotNull(message = "桌号不能为空")
-    private String destNumber;//桌号
+    private String deskNumber;//桌号
     @NotNull(message = "使用人数不能为空")
     @Max(value = 10, message = "最大人数不能超多10人")
     private Integer useNumber;//使用人数
@@ -60,12 +60,12 @@ public class BackgroundOrderDTO {
         this.storeId = storeId;
     }
 
-    public String getDestNumber() {
-        return destNumber;
+    public String getDeskNumber() {
+        return deskNumber;
     }
 
-    public void setDestNumber(String destNumber) {
-        this.destNumber = destNumber;
+    public void setDeskNumber(String deskNumber) {
+        this.deskNumber = deskNumber;
     }
 
     public Integer getUseNumber() {
