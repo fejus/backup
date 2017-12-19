@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.adatafun.airportshop.order.mapper.OrdOrderLanguageMapper">
+    <resultMap id="BaseResultMap" type="com.adatafun.airportshop.order.pojo.po.OrdOrderLanguage">
+        <id column="multi_language_id" jdbcType="INTEGER" property="multiLanguageId"/>
+        <result column="language" jdbcType="VARCHAR" property="language"/>
+        <result column="order_id" jdbcType="VARCHAR" property="orderId"/>
+        <result column="enterprise_name" jdbcType="VARCHAR" property="enterpriseName"/>
+        <result column="store_name" jdbcType="VARCHAR" property="storeName"/>
+        <result column="remarks" jdbcType="VARCHAR" property="remarks"/>
+        <result column="store_remarks" jdbcType="VARCHAR" property="storeRemarks"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="create_user" jdbcType="VARCHAR" property="createUser"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="update_user" jdbcType="VARCHAR" property="updateUser"/>
+        <result column="is_deleted" jdbcType="INTEGER" property="isDeleted"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    multi_language_id, language, order_id, enterprise_name, store_name, remarks, store_remarks, 
+    create_time, create_user, update_time, update_user, is_deleted
+  </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from ord_order_language
+        where multi_language_id = #{multiLanguageId,jdbcType=INTEGER}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from ord_order_language
+    where multi_language_id = #{multiLanguageId,jdbcType=INTEGER}
+  </delete>
+    <insert id="insert" parameterType="com.adatafun.airportshop.order.pojo.po.OrdOrderLanguage">
+    insert into ord_order_language (multi_language_id, language, order_id, 
+      enterprise_name, store_name, remarks, 
+      store_remarks, create_time, create_user, 
+      update_time, update_user, is_deleted
+      )
+    values (#{multiLanguageId,jdbcType=INTEGER}, #{language,jdbcType=VARCHAR}, #{orderId,jdbcType=VARCHAR}, 
+      #{enterpriseName,jdbcType=VARCHAR}, #{storeName,jdbcType=VARCHAR}, #{remarks,jdbcType=VARCHAR}, 
+      #{storeRemarks,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{createUser,jdbcType=VARCHAR}, 
+      #{updateTime,jdbcType=TIMESTAMP}, #{updateUser,jdbcType=VARCHAR}, #{isDeleted,jdbcType=INTEGER}
+      )
+  </insert>
+    <insert id="insertSelective" parameterType="com.adatafun.airportshop.order.pojo.po.OrdOrderLanguage">
+        insert into ord_order_language
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="multiLanguageId != null">
+                multi_language_id,
+            </if>
+            <if test="language != null">
+                language,
+            </if>
+            <if test="orderId != null">
+                order_id,
+            </if>
+            <if test="enterpriseName != null">
+                enterprise_name,
+            </if>
+            <if test="storeName != null">
+                store_name,
+            </if>
+            <if test="remarks != null">
+                remarks,
+            </if>
+            <if test="storeRemarks != null">
+                store_remarks,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="createUser != null">
+                create_user,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+            <if test="updateUser != null">
+                update_user,
+            </if>
+            <if test="isDeleted != null">
+                is_deleted,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="multiLanguageId != null">
+                #{multiLanguageId,jdbcType=INTEGER},
+            </if>
+            <if test="language != null">
+                #{language,jdbcType=VARCHAR},
+            </if>
+            <if test="orderId != null">
+                #{orderId,jdbcType=VARCHAR},
+            </if>
+            <if test="enterpriseName != null">
+                #{enterpriseName,jdbcType=VARCHAR},
+            </if>
+            <if test="storeName != null">
+                #{storeName,jdbcType=VARCHAR},
+            </if>
+            <if test="remarks != null">
+                #{remarks,jdbcType=VARCHAR},
+            </if>
+            <if test="storeRemarks != null">
+                #{storeRemarks,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createUser != null">
+                #{createUser,jdbcType=VARCHAR},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateUser != null">
+                #{updateUser,jdbcType=VARCHAR},
+            </if>
+            <if test="isDeleted != null">
+                #{isDeleted,jdbcType=INTEGER},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.adatafun.airportshop.order.pojo.po.OrdOrderLanguage">
+        update ord_order_language
+        <set>
+            <if test="language != null">
+                language = #{language,jdbcType=VARCHAR},
+            </if>
+            <if test="orderId != null">
+                order_id = #{orderId,jdbcType=VARCHAR},
+            </if>
+            <if test="enterpriseName != null">
+                enterprise_name = #{enterpriseName,jdbcType=VARCHAR},
+            </if>
+            <if test="storeName != null">
+                store_name = #{storeName,jdbcType=VARCHAR},
+            </if>
+            <if test="remarks != null">
+                remarks = #{remarks,jdbcType=VARCHAR},
+            </if>
+            <if test="storeRemarks != null">
+                store_remarks = #{storeRemarks,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createUser != null">
+                create_user = #{createUser,jdbcType=VARCHAR},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateUser != null">
+                update_user = #{updateUser,jdbcType=VARCHAR},
+            </if>
+            <if test="isDeleted != null">
+                is_deleted = #{isDeleted,jdbcType=INTEGER},
+            </if>
+        </set>
+        where multi_language_id = #{multiLanguageId,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.adatafun.airportshop.order.pojo.po.OrdOrderLanguage">
+    update ord_order_language
+    set language = #{language,jdbcType=VARCHAR},
+      order_id = #{orderId,jdbcType=VARCHAR},
+      enterprise_name = #{enterpriseName,jdbcType=VARCHAR},
+      store_name = #{storeName,jdbcType=VARCHAR},
+      remarks = #{remarks,jdbcType=VARCHAR},
+      store_remarks = #{storeRemarks,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      create_user = #{createUser,jdbcType=VARCHAR},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      update_user = #{updateUser,jdbcType=VARCHAR},
+      is_deleted = #{isDeleted,jdbcType=INTEGER}
+    where multi_language_id = #{multiLanguageId,jdbcType=INTEGER}
+  </update>
+
+    <select id="selectLanguageListByOrderId" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select
+         <include refid="Base_Column_List"/>
+          from ord_order_language
+          where is_deleted = 0 and order_id = #{orderId,jdbcType=VARCHAR}
+    </select>
+
+    <update id="updateStoreRemarks" parameterType="java.lang.String">
+        update ord_order_language
+        set store_remarks = #{storeRemarks,jdbcType=VARCHAR},
+        update_user = #{update_user,jdbcType=VARCHAR},
+        update_time  = now
+        where multi_language_id =  #{multiLanguageId,jdbcType=VARCHAR}
+    </update>
+</mapper>

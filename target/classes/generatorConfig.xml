@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration PUBLIC
+"-//mybatis.org//DTD MyBatis Generator Configuration 
+1.0//EN"
+"http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd"
+>
+<generatorConfiguration>
+    <classPathEntry location="/Users/Lin/.m2/repository/mysql/mysql-connector-java/5.1.38/mysql-connector-java-5.1.38.jar" />
+    <!-- 配置数据源和生成的代码所存放的位置 -->
+    <context id="context1">
+        <!-- 生成的Java文件的编码 -->
+        <property name="javaFileEncoding" value="UTF-8"/>
+        <!--去除注释  -->
+        <commentGenerator type="com.adatafun.airportshop.order.common.util.MyCommentGenerator">
+            <property name="suppressAllComments" value="false" />
+        </commentGenerator>
+        <!-- <commentGenerator type="org.mybatis.generator.internal.DG2CommentGenerator">
+              <property name="suppressAllComments" value="false" />
+          </commentGenerator>-->
+        <jdbcConnection driverClass="com.mysql.jdbc.Driver"
+                        connectionURL="jdbc:mysql://120.27.217.130:3306/shop_order" userId="root"
+                        password="Wyun4test" />
+
+		<!-- 所生成的实体类的位置默认资源包src -->
+		<javaModelGenerator targetPackage="com.adatafun.airportshop.order.pojo.po"
+							targetProject="src/main/java" />
+			
+		<!-- 所生成的sqlMap的影射文件的位置,默认资源包src -->
+		<sqlMapGenerator targetPackage="conf.mybatis.mapper"
+						 targetProject="src/main/resources"/>
+
+		<!-- 指定生成访问映射xml文件的接口所在包和此包在项目中的地址； -->
+		<javaClientGenerator type="XMLMAPPER"
+							 targetPackage="com.adatafun.airportshop.order.mapper"
+							 targetProject="src/main/java" />
+
+		<!-- 为哪些表生成代码 tableName:表名 schema:不用填写 -->
+
+	 	<table schema="" tableName="ord_order" domainObjectName="OrdOrder" enableCountByExample="false"
+				enableUpdateByExample="false" enableDeleteByExample="false"
+				enableSelectByExample="false" selectByExampleQueryId="false">
+		</table>
+
+        <!--<table schema="" tableName="ord_sub_order_language" domainObjectName="OrdSubOrderLanguage" enableCountByExample="false"
+               enableUpdateByExample="false" enableDeleteByExample="false"
+               enableSelectByExample="false" selectByExampleQueryId="false">
+        </table>
+
+
+        <table schema="" tableName="ord_order" domainObjectName="OrdOrder" enableCountByExample="false"
+               enableUpdateByExample="false" enableDeleteByExample="false"
+               enableSelectByExample="false" selectByExampleQueryId="false">
+        </table>
+
+        <table schema="" tableName="ord_order_language" domainObjectName="OrdOrderLanguage" enableCountByExample="false"
+               enableUpdateByExample="false" enableDeleteByExample="false"
+               enableSelectByExample="false" selectByExampleQueryId="false">
+        </table>
+
+        <table schema="" tableName="ord_bill" domainObjectName="OrdBill" enableCountByExample="false"
+               enableUpdateByExample="false" enableDeleteByExample="false"
+               enableSelectByExample="false" selectByExampleQueryId="false">
+        </table>-->
+
+
+
+	</context>
+</generatorConfiguration>
+	

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- For assistance related to logback-translator or configuration  -->
+<!-- files in general, please contact the logback user mailing list -->
+<!-- at http://www.qos.ch/mailman/listinfo/logback-user             -->
+<!--                                                                -->
+<!-- For professional support please see                            -->
+<!--    http://www.qos.ch/shop/products/professionalSupport         -->
+<!--                                                                -->
+<configuration>
+    <!-- 定义log文件的目录 -->
+    <property name="LOG_HOME" value="/java/logs"></property>
+    <property name="ENCODER_PATTERN"
+              value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{80} - %msg%n"></property>
+
+    <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <charset>UTF-8</charset>
+            <Pattern>${ENCODER_PATTERN}</Pattern>
+        </encoder>
+    </appender>
+
+    <appender name="file" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_HOME}/cloud-order-%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxFileSize>20MB</maxFileSize>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <charset>UTF-8</charset>
+            <Pattern>${ENCODER_PATTERN}</Pattern>
+        </encoder>
+        <append>true</append>
+        <prudent>false</prudent>
+    </appender>
+
+    <logger name="org.apache.zookeeper.ClientCnxn" level="ERROR">
+        <appender-ref ref="stdout"/>
+        <appender-ref ref="file"/>
+    </logger>
+    <root level="DEBUG">
+        <appender-ref ref="stdout"/>
+        <appender-ref ref="file"/>
+    </root>
+
+    <logger name="dao" level="DEBUG">
+        <appender-ref ref="stdout"/>
+        <appender-ref ref="file"/>
+    </logger>
+</configuration>

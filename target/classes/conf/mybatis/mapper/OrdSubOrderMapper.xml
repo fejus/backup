@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.adatafun.airportshop.order.mapper.OrdSubOrderMapper">
+  <resultMap id="BaseResultMap" type="com.adatafun.airportshop.order.pojo.po.OrdSubOrder">
+    <id column="sub_order_id" jdbcType="VARCHAR" property="subOrderId" />
+    <result column="order_id" jdbcType="VARCHAR" property="orderId" />
+    <result column="product_id" jdbcType="VARCHAR" property="productId" />
+    <result column="specification_id" jdbcType="VARCHAR" property="specificationId" />
+    <result column="product_number" jdbcType="INTEGER" property="productNumber" />
+    <result column="product_img" jdbcType="VARCHAR" property="productImg" />
+    <result column="unit_price" jdbcType="INTEGER" property="unitPrice" />
+    <result column="total_price" jdbcType="INTEGER" property="totalPrice" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="create_user" jdbcType="VARCHAR" property="createUser" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="update_user" jdbcType="VARCHAR" property="updateUser" />
+    <result column="is_deleted" jdbcType="INTEGER" property="isDeleted" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    sub_order_id, order_id, product_id, specification_id, product_number, product_img, 
+    unit_price, total_price, create_time, create_user, update_time, update_user, is_deleted
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from ord_sub_order
+    where sub_order_id = #{subOrderId,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from ord_sub_order
+    where sub_order_id = #{subOrderId,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.adatafun.airportshop.order.pojo.po.OrdSubOrder">
+    insert into ord_sub_order (sub_order_id, order_id, product_id, 
+      specification_id, product_number, product_img, 
+      unit_price, total_price, create_time, 
+      create_user, update_time, update_user, 
+      is_deleted)
+    values (#{subOrderId,jdbcType=VARCHAR}, #{orderId,jdbcType=VARCHAR}, #{productId,jdbcType=VARCHAR}, 
+      #{specificationId,jdbcType=VARCHAR}, #{productNumber,jdbcType=INTEGER}, #{productImg,jdbcType=VARCHAR}, 
+      #{unitPrice,jdbcType=INTEGER}, #{totalPrice,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{createUser,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP}, #{updateUser,jdbcType=VARCHAR}, 
+      #{isDeleted,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="com.adatafun.airportshop.order.pojo.po.OrdSubOrder">
+    insert into ord_sub_order
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="subOrderId != null">
+        sub_order_id,
+      </if>
+      <if test="orderId != null">
+        order_id,
+      </if>
+      <if test="productId != null">
+        product_id,
+      </if>
+      <if test="specificationId != null">
+        specification_id,
+      </if>
+      <if test="productNumber != null">
+        product_number,
+      </if>
+      <if test="productImg != null">
+        product_img,
+      </if>
+      <if test="unitPrice != null">
+        unit_price,
+      </if>
+      <if test="totalPrice != null">
+        total_price,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="createUser != null">
+        create_user,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+      <if test="updateUser != null">
+        update_user,
+      </if>
+      <if test="isDeleted != null">
+        is_deleted,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="subOrderId != null">
+        #{subOrderId,jdbcType=VARCHAR},
+      </if>
+      <if test="orderId != null">
+        #{orderId,jdbcType=VARCHAR},
+      </if>
+      <if test="productId != null">
+        #{productId,jdbcType=VARCHAR},
+      </if>
+      <if test="specificationId != null">
+        #{specificationId,jdbcType=VARCHAR},
+      </if>
+      <if test="productNumber != null">
+        #{productNumber,jdbcType=INTEGER},
+      </if>
+      <if test="productImg != null">
+        #{productImg,jdbcType=VARCHAR},
+      </if>
+      <if test="unitPrice != null">
+        #{unitPrice,jdbcType=INTEGER},
+      </if>
+      <if test="totalPrice != null">
+        #{totalPrice,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createUser != null">
+        #{createUser,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateUser != null">
+        #{updateUser,jdbcType=VARCHAR},
+      </if>
+      <if test="isDeleted != null">
+        #{isDeleted,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.adatafun.airportshop.order.pojo.po.OrdSubOrder">
+    update ord_sub_order
+    <set>
+      <if test="orderId != null">
+        order_id = #{orderId,jdbcType=VARCHAR},
+      </if>
+      <if test="productId != null">
+        product_id = #{productId,jdbcType=VARCHAR},
+      </if>
+      <if test="specificationId != null">
+        specification_id = #{specificationId,jdbcType=VARCHAR},
+      </if>
+      <if test="productNumber != null">
+        product_number = #{productNumber,jdbcType=INTEGER},
+      </if>
+      <if test="productImg != null">
+        product_img = #{productImg,jdbcType=VARCHAR},
+      </if>
+      <if test="unitPrice != null">
+        unit_price = #{unitPrice,jdbcType=INTEGER},
+      </if>
+      <if test="totalPrice != null">
+        total_price = #{totalPrice,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createUser != null">
+        create_user = #{createUser,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateUser != null">
+        update_user = #{updateUser,jdbcType=VARCHAR},
+      </if>
+      <if test="isDeleted != null">
+        is_deleted = #{isDeleted,jdbcType=INTEGER},
+      </if>
+    </set>
+    where sub_order_id = #{subOrderId,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.adatafun.airportshop.order.pojo.po.OrdSubOrder">
+    update ord_sub_order
+    set order_id = #{orderId,jdbcType=VARCHAR},
+      product_id = #{productId,jdbcType=VARCHAR},
+      specification_id = #{specificationId,jdbcType=VARCHAR},
+      product_number = #{productNumber,jdbcType=INTEGER},
+      product_img = #{productImg,jdbcType=VARCHAR},
+      unit_price = #{unitPrice,jdbcType=INTEGER},
+      total_price = #{totalPrice,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      create_user = #{createUser,jdbcType=VARCHAR},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      update_user = #{updateUser,jdbcType=VARCHAR},
+      is_deleted = #{isDeleted,jdbcType=INTEGER}
+    where sub_order_id = #{subOrderId,jdbcType=VARCHAR}
+  </update>
+</mapper>
