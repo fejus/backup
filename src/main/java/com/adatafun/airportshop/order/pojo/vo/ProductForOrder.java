@@ -5,8 +5,6 @@ package com.adatafun.airportshop.order.pojo.vo;
  * Created by Lin on 2017/12/1.
  */
 public class ProductForOrder {
-    private Long productId;
-
     private Long specificationId;
 
     private String specificationName;
@@ -25,13 +23,6 @@ public class ProductForOrder {
 
     private String language;
 
-    public Long getProductId() {
-        return productId;
-    }
-
-    public void setProductId(Long productId) {
-        this.productId = productId;
-    }
 
     public Long getSpecificationId() {
         return specificationId;

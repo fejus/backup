@@ -1,5 +1,6 @@
 package com.adatafun.airportshop.order.controller.h5;
 
+import com.adatafun.airportshop.order.service.interfaces.OrderService;
 import com.adatafun.common.springthrift.annotation.RequestBody;
 import com.adatafun.common.springthrift.annotation.RequestMapping;
 import com.adatafun.common.springthrift.annotation.RequestParam;
@@ -14,7 +15,7 @@ import com.adatafun.airportshop.order.pojo.po.OrdOrderLanguage;
 import com.adatafun.airportshop.order.pojo.po.OrdSubOrder;
 import com.adatafun.airportshop.order.pojo.vo.OrderDetailVO;
 import com.adatafun.airportshop.order.pojo.vo.OrderItemVO;
-import com.adatafun.airportshop.order.service.OrderService;
+import com.adatafun.airportshop.order.service.OrderServiceImpl;
 import com.adatafun.airportshop.order.service.rpc.MemberUserService;
 import com.adatafun.utils.api.ResUtils;
 import com.adatafun.utils.api.Result;
@@ -22,10 +23,8 @@ import com.adatafun.utils.common.JWTUtil;
 import com.adatafun.utils.common.StringUtils;
 import com.adatafun.utils.data.BeanValidateUtil;
 import com.adatafun.utils.mybatis.common.ResponsePage;
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
 
 import java.util.ArrayList;
@@ -86,6 +85,9 @@ public class H5OrderController {
         ordOrder.setSubOrderNumber(orderInfo.getSubOrderNumber());
         ordOrder.setClientName(userInfo.getString("nickName"));
         ordOrder.setClientMobile(userInfo.getString("mobile"));
+        ordOrder.setOrderChannel(orderInfo.getChannelType());
+        ordOrder.setLanguage(orderInfo.getLanguage());
+        ordOrder.setFormId(orderInfo.getFormId());
 
         //主订单翻译字段信息
         OrdOrderLanguage oriOrderLanguage = new OrdOrderLanguage();
@@ -112,8 +114,8 @@ public class H5OrderController {
         }
 
 
-        orderService.saveOrder(ordOrder, oriOrderLanguage, subOrders, ordBill);
-        return JSONObject.toJSONString(ResUtils.result(200));
+        String result = orderService.saveOrder(ordOrder, oriOrderLanguage, subOrders, ordBill);
+        return result;
 
     }
 
@@ -172,7 +174,7 @@ public class H5OrderController {
     @RequestMapping(value = "h5/cancelOrder")
     public String cancelOrder(@ThriftRequest JSONObject request) {
         String clientId = request.getString("clientId");
-        String orderId = request.getString("orderIds");
+        String orderId = request.getString("orderId");
         List<String> orderIds = new ArrayList<>();
         orderIds.add(orderId);
         Result result = orderService.orderCancel(orderIds, ChannelType.MINI_PROGRAM, clientId);

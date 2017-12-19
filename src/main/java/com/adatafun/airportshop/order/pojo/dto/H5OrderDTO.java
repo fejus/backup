@@ -18,6 +18,8 @@ public class H5OrderDTO implements Serializable {
     private String enterpriseId;//商户编码
     @NotNull(message = "无门店标识")
     private String storeId;//门店编码
+    @NotNull(message = "无渠道标示")
+    private String channelType;
     @NotNull(message = "桌号不能为空")
     private String deskNumber;//桌号
     @NotNull(message = "使用人数不能为空")
@@ -25,9 +27,11 @@ public class H5OrderDTO implements Serializable {
     private Integer useNumber;//使用人数
     @Min(value = 1, message = "至少选中一个菜品")
     private Integer subOrderNumber;//子订单数量
+    private String formId;//小程序表单formID
     private List<SubOrderDTO> subOrderProList;//子订单列表
     private OrderBillInfoDTO billInfo;//发票信息
     private String remarks;//备注
+
 
     public String getLanguage() {
         return language;
@@ -43,6 +47,14 @@ public class H5OrderDTO implements Serializable {
 
     public void setEnterpriseId(String enterpriseId) {
         this.enterpriseId = enterpriseId;
+    }
+
+    public String getChannelType() {
+        return channelType;
+    }
+
+    public void setChannelType(String channelType) {
+        this.channelType = channelType;
     }
 
     public String getStoreId() {
@@ -75,6 +87,14 @@ public class H5OrderDTO implements Serializable {
 
     public void setSubOrderNumber(Integer subOrderNumber) {
         this.subOrderNumber = subOrderNumber;
+    }
+
+    public String getFormId() {
+        return formId;
+    }
+
+    public void setFormId(String formId) {
+        this.formId = formId;
     }
 
     public List<SubOrderDTO> getSubOrderProList() {

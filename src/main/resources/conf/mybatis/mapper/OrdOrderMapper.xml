@@ -444,7 +444,7 @@
     </resultMap>
 
     <resultMap id="OrderDetailResultMap" type="com.adatafun.airportshop.order.pojo.vo.OrderDetailVO"
-              >
+    >
 
         <result column="enterprise_name" jdbcType="VARCHAR" property="enterpriseName"/>
         <result column="store_name" jdbcType="VARCHAR" property="storeName"/>
@@ -660,62 +660,88 @@
         osol.product_name,
         osol.specification_name
         FROM
-        ord_order oo
+        (SELECT
+        o.order_id,
+        o.order_channel,
+        o.order_no,
+        o.create_time,
+        o.client_id,
+        o.client_name,
+        o.client_mobile,
+        o.enterprise_id,
+        o.store_id,
+        o.order_status,
+        o.pay_status,
+        o.desk_number,
+        o.use_number,
+        o.sub_order_number,
+        o.order_amount,
+        o.actual_amount,
+        o.pay_type,
+        o.pay_no,
+        o.pay_time,
+        o.notify_status,
+        o.get_food_number
+        FROM
+        ord_order o
+        WHERE
+        o.is_deleted = 0
+        <if test='clientId != null and  clientId != "" '>
+            and o.client_id = #{clientId,jdbcType=VARCHAR}
+        </if>
+        <if test='storeId != null and storeId != "" '>
+            and o.store_id = #{storeId,jdbcType=VARCHAR}
+        </if>
+        <if test='enterpriseId != null and enterpriseId != "" '>
+            and o.enterpriseId = #{enterpriseId,jdbcType=VARCHAR}
+        </if>
+        <if test='orderStatus != null and orderStatus != "" '>
+            and o.order_status = #{orderStatus,jdbcType=VARCHAR}
+        </if>
+        <if test='payStatus != null and payStatus != "" '>
+            and o.pay_status = #{payStatus,jdbcType=VARCHAR}
+        </if>
+        <if test='orderId != null and orderId != "" '>
+            and o.order_id = #{orderId,jdbcType=VARCHAR}
+        </if>
+        <if test='orderNo != null and orderNo != "" '>
+            and o.order_no = #{orderNo,jdbcType=VARCHAR}
+        </if>
+        <if test='clientMobile != null and clientMobile != "" '>
+            and o.client_mobile = #{clientMobile,jdbcType=VARCHAR}
+        </if>
+        <if test='channelType != null and channelType != "" '>
+            and o.channel_type = #{channelType,jdbcType=VARCHAR}
+        </if>
+        <if test='orderTimeStart != null and orderTimeStart != ""'>
+            and o.create_time >= #{orderTimeStart}
+        </if>
+        <if test='orderTimeEnd != null and orderTimeEnd != "" '>
+            and o.create_time &lt; #{orderTimeEnd}
+        </if>
+        <if test='comboCondition != null and comboCondition != "" '>
+            and ( o.order_no = #{comboCondition,jdbcType=VARCHAR}
+            or o.get_food_number = #{comboCondition,jdbcType=VARCHAR}
+            or o.desk_number = #{comboCondition,jdbcType=VARCHAR}
+            or o.client_mobile = #{comboCondition,jdbcType=VARCHAR}
+            )
+        </if>
+        order by create_time desc
+        limit #{startNumber},#{rows}
+        ) oo
         JOIN
         ord_order_language ool ON ool.order_id = oo.order_id
-        AND ool.language = #{language,jdbcType=VARCHAR}
+        AND ool.language = 'en'
         AND ool.is_deleted = 0
         JOIN
         ord_sub_order oso ON oso.order_id = oo.order_id
         AND oso.is_deleted = 0
         JOIN
         ord_sub_order_language osol ON osol.sub_order_id = oso.sub_order_id
-        AND osol.language = #{language,jdbcType=VARCHAR}
+        AND osol.language = 'en'
         AND osol.is_deleted = 0
-        WHERE
-        oo.is_deleted = 0
-        <if test='clientId != null and  clientId != "" '>
-            and oo.client_id = #{clientId,jdbcType=VARCHAR}
-        </if>
-        <if test='storeId != null and storeId != "" '>
-            and oo.store_id = #{storeId,jdbcType=VARCHAR}
-        </if>
-        <if test='enterpriseId != null and enterpriseId != "" '>
-            and oo.enterpriseId = #{enterpriseId,jdbcType=VARCHAR}
-        </if>
-        <if test='orderStatus != null and orderStatus != "" '>
-            and oo.order_status = #{orderStatus,jdbcType=VARCHAR}
-        </if>
-        <if test='payStatus != null and payStatus != "" '>
-            and oo.pay_status = #{payStatus,jdbcType=VARCHAR}
-        </if>
-        <if test='orderId != null and orderId != "" '>
-            and oo.order_id = #{orderId,jdbcType=VARCHAR}
-        </if>
-        <if test='orderNo != null and orderNo != "" '>
-            and oo.order_no = #{orderNo,jdbcType=VARCHAR}
-        </if>
-        <if test='clientMobile != null and clientMobile != "" '>
-            and oo.client_mobile = #{clientMobile,jdbcType=VARCHAR}
-        </if>
-        <if test='channelType != null and channelType != "" '>
-            and oo.channel_type = #{channelType,jdbcType=VARCHAR}
-        </if>
-        <if test='orderTimeStart != null and orderTimeStart != ""'>
-            and oo.create_time >= #{orderTimeStart}
-        </if>
-        <if test='orderTimeEnd != null and orderTimeEnd != "" '>
-            and oo.create_time &lt; #{orderTimeEnd}
-        </if>
-        <if test='comboCondition != null and comboCondition != "" '>
-            and ( oo.order_no = #{comboCondition,jdbcType=VARCHAR}
-            or oo.get_food_number = #{comboCondition,jdbcType=VARCHAR}
-            or oo.desk_number = #{comboCondition,jdbcType=VARCHAR}
-            or oo.client_mobile = #{comboCondition,jdbcType=VARCHAR}
-            )
-        </if>
-        order by create_time desc
-        limit #{startNumber},#{endNumber}
+        ORDER BY oo.create_time DESC
+
     </select>
 
     <select id="countOrder" parameterType="com.adatafun.airportshop.order.pojo.dto.OrderListQueryParamDTO"

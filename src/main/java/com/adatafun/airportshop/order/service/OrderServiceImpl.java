@@ -8,12 +8,9 @@ import com.adatafun.airportshop.order.pojo.dto.EnterpriseInfoDTO;
 import com.adatafun.airportshop.order.pojo.dto.NotifyGetFoodInfoDTO;
 import com.adatafun.airportshop.order.pojo.dto.OrderListQueryParamDTO;
 import com.adatafun.airportshop.order.pojo.dto.StoreInfoDTO;
-import com.adatafun.airportshop.order.pojo.vo.ProductForOrder;
+import com.adatafun.airportshop.order.pojo.vo.*;
 import com.adatafun.airportshop.order.pojo.po.*;
-import com.adatafun.airportshop.order.pojo.vo.OrderDetailVO;
-import com.adatafun.airportshop.order.pojo.vo.OrderItemVO;
-import com.adatafun.airportshop.order.pojo.vo.OrderListExportResultVO;
-import com.adatafun.airportshop.order.pojo.vo.SubOrderDetailVO;
+import com.adatafun.airportshop.order.service.interfaces.OrderService;
 import com.adatafun.airportshop.order.service.rpc.MemberUserService;
 import com.adatafun.airportshop.order.service.rpc.ShopInfoService;
 import com.adatafun.airportshop.order.service.rpc.ShopProductService;
@@ -42,10 +39,10 @@ import java.util.List;
  * desc : 订单服务
  * Created by Lin on 2017/11/6.
  */
-@Service
+@Service()
 @Transactional(propagation = Propagation.REQUIRED)
-public class OrderService {
-    private static Logger log = LoggerFactory.getLogger(OrderService.class);
+public class OrderServiceImpl  implements OrderService{
+    private static Logger log = LoggerFactory.getLogger(OrderServiceImpl.class);
 
 
     @Autowired
@@ -86,7 +83,7 @@ public class OrderService {
         for (OrdSubOrder ordSubOrder : subOrders) {
             specicationIds.add(ordSubOrder.getSpecificationId());
         }
-        List<List<ProductForOrder>> specifications = shopProductService.getProductInfo(StringUtils.collectionToDelimitedString(specicationIds,","));
+        List<ProductsForOrderDTO> specifications = shopProductService.getProductInfo(StringUtils.collectionToDelimitedString(specicationIds, ","));
         //to 做产品信息的校验
 
 
@@ -103,7 +100,10 @@ public class OrderService {
         //保存发票信息
         //saveBillInfo(ordOrder, ordBill);
 
-        return null;
+        JSONObject result = new JSONObject();
+        result.put("orderId",orderId);
+
+        return JSONObject.toJSONString(ResUtils.result(result));
 
     }
 
@@ -121,7 +121,6 @@ public class OrderService {
         //生成订单编码
         String orderNo = OrderNoUtil.createOrderNo(OrderType.TS_ORDER, ChannelType.getEnumByValue(ordOrder.getOrderChannel()));
         ordOrder.setOrderNo(orderNo);
-        ordOrder.setOrderId(UUIDUtil.getUUID());
 
         //计算总价格
         BigDecimal totalAmount = new BigDecimal(0);
@@ -136,6 +135,7 @@ public class OrderService {
         ordOrder.setOrderStatus(OrderStatus.NEW.value());
         ordOrder.setPayStatus(PayStatus.NO_PAY.value());
         ordOrder.setCreateTime(new Date());
+        ordOrder.setIsDeleted(BooleanEnum.NO.value());
         ordOrderMapper.insert(ordOrder);
 
         //处理多语言
@@ -157,7 +157,6 @@ public class OrderService {
         //多语言处理
         LanguageEnum oriLanguageEnum = LanguageEnum.getEnumByValue(ordOrder.getLanguage());
         List<OrdOrderLanguage> ordOrderLanguages = new ArrayList<>();
-        ordOrderLanguages.add(oriOrderLanguage);
 
         List<String> languages = new ArrayList<>();//商家支持的多语言列表
         languages.add(LanguageEnum.ZH_CN.value());
@@ -187,8 +186,34 @@ public class OrderService {
                 orderLanguage.setCreateTime(oriOrderLanguage.getCreateTime());
                 orderLanguage.setCreateUser(orderLanguage.getCreateUser());
                 orderLanguage.setIsDeleted(BooleanEnum.NO.value());
+                orderLanguage.setCreateTime(ordOrder.getCreateTime());
 
                 ordOrderLanguages.add(orderLanguage);
+            } else {
+                oriOrderLanguage.setLanguage(language);
+                for (EnterpriseInfoDTO enterpriseInfoDTO : enterpriseInfoLanguages) {
+                    if (language.equals(enterpriseInfoDTO.getLanguage())) {
+                        oriOrderLanguage.setEnterpriseName(enterpriseInfoDTO.getCompanyName());//商户名称
+                    }
+                }
+                for (StoreInfoDTO storeInfoDTO : storeInfoLanguages) {
+                    if (language.equals(storeInfoDTO.getLanguage())) {
+                        oriOrderLanguage.setStoreName(storeInfoDTO.getStoreName());//门店名称
+                    }
+                }
+                oriOrderLanguage.setOrderId(ordOrder.getOrderId());
+                if (!StringUtils.isEmpty(oriOrderLanguage.getRemarks())) {
+                    oriOrderLanguage.setRemarks(LanguageUtil.getTransResult(oriOrderLanguage.getRemarks(), oriLanguageEnum, languageEnum));
+                }
+                if (!StringUtils.isEmpty(oriOrderLanguage.getStoreRemarks())) {
+                    oriOrderLanguage.setRemarks(LanguageUtil.getTransResult(oriOrderLanguage.getStoreRemarks(), oriLanguageEnum, languageEnum));
+                }
+                oriOrderLanguage.setCreateTime(oriOrderLanguage.getCreateTime());
+                oriOrderLanguage.setCreateUser(ordOrder.getCreateUser());
+                oriOrderLanguage.setIsDeleted(BooleanEnum.NO.value());
+                oriOrderLanguage.setCreateTime(ordOrder.getCreateTime());
+
+                ordOrderLanguages.add(oriOrderLanguage);
             }
         }
 
@@ -208,16 +233,17 @@ public class OrderService {
      * @param specifications 菜品规格列表
      * @param language 语言
      */
-    public void saveSubOrder(String orderId, List<OrdSubOrder> subOrders, List<List<ProductForOrder>> specifications, String language) {
+    public void saveSubOrder(String orderId, List<OrdSubOrder> subOrders, List<ProductsForOrderDTO> specifications, String language) {
         for (int i = 0; i < subOrders.size(); i++) {
             OrdSubOrder subOrder = subOrders.get(i);
             subOrder.setSubOrderId(UUIDUtil.getUUID());
-            List<ProductForOrder> specification = specifications.get(i);
+            ProductsForOrderDTO specification = specifications.get(i);
             subOrder.setOrderId(orderId);
-            subOrder.setProductImg(specification.get(0).getProductCoverImg());//图片
-            subOrder.setUnitPrice(specification.get(0).getSpecificationPrice());//单价
+            subOrder.setProductImg(specification.getProductForOrderDTOList().get(0).getProductCoverImg());//图片
+            subOrder.setUnitPrice(specification.getProductForOrderDTOList().get(0).getSpecificationPrice());//单价
             subOrder.setTotalPrice(subOrder.getProductNumber() * subOrder.getUnitPrice());//单品总价
             subOrder.setCreateTime(new Date());
+            subOrder.setIsDeleted(BooleanEnum.NO.value());
             ordSubOrderMapper.insert(subOrder);
             //处理多语言
             saveSubOrderLanguage(language, subOrder, specification);
@@ -231,7 +257,7 @@ public class OrderService {
      * @param subOrder
      * @param specification
      */
-    public void saveSubOrderLanguage(String oriLanguage, OrdSubOrder subOrder, List<ProductForOrder> specification) {
+    public void saveSubOrderLanguage(String oriLanguage, OrdSubOrder subOrder, ProductsForOrderDTO specification) {
         //多语言处理
         LanguageEnum oriLanguageEnum = LanguageEnum.getEnumByValue(oriLanguage);
         List<OrdSubOrderLanguage> orderLanguages = new ArrayList<>();
@@ -243,7 +269,7 @@ public class OrderService {
             LanguageEnum languageEnum = LanguageEnum.getEnumByValue(language);
             OrdSubOrderLanguage orderLanguage = new OrdSubOrderLanguage();
             orderLanguage.setLanguage(language);
-            for (ProductForOrder productForOrder : specification) {
+            for (ProductForOrder productForOrder : specification.getProductForOrderDTOList()) {
                 if (language.equals(productForOrder.getLanguage())) {
                     orderLanguage.setProductName(productForOrder.getProductName());
                     orderLanguage.setSpecificationName(productForOrder.getSpecificationName());
@@ -256,6 +282,7 @@ public class OrderService {
 
         //循环插入
         for (OrdSubOrderLanguage ordOrderLanguage : orderLanguages) {
+            ordOrderLanguage.setIsDeleted(BooleanEnum.NO.value());
             ordSubOrderLanguageMapper.insert(ordOrderLanguage);
         }
     }
@@ -456,7 +483,7 @@ public class OrderService {
             for (OrdOrder ordOrder : orders) {
                 cancelSingleOrder(ordOrder, channelType, operatorId);
             }
-            result = ResUtils.result(Result.STATUS.SUCCESS);
+            result = ResUtils.result(Result.STATUS.SUCCESS.getStatus(),Result.STATUS.SUCCESS.getMsg());
         }
 
 

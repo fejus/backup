@@ -2,7 +2,6 @@ package com.adatafun.airportshop.order.controller.background;
 
 import com.adatafun.airportshop.order.common.enums.ChannelType;
 import com.adatafun.airportshop.order.pojo.dto.BackgroundOrderDTO;
-import com.adatafun.airportshop.order.pojo.dto.H5OrderDTO;
 import com.adatafun.airportshop.order.pojo.dto.OrderListQueryParamDTO;
 import com.adatafun.airportshop.order.pojo.dto.SubOrderDTO;
 import com.adatafun.airportshop.order.pojo.po.OrdOrder;
@@ -11,7 +10,8 @@ import com.adatafun.airportshop.order.pojo.po.OrdSubOrder;
 import com.adatafun.airportshop.order.pojo.vo.OrderDetailVO;
 import com.adatafun.airportshop.order.pojo.vo.OrderItemVO;
 import com.adatafun.airportshop.order.pojo.vo.OrderListExportResultVO;
-import com.adatafun.airportshop.order.service.OrderService;
+import com.adatafun.airportshop.order.service.OrderServiceImpl;
+import com.adatafun.airportshop.order.service.interfaces.OrderService;
 import com.adatafun.airportshop.order.service.rpc.MemberUserService;
 import com.adatafun.common.springthrift.annotation.RequestBody;
 import com.adatafun.common.springthrift.annotation.RequestMapping;
@@ -24,7 +24,6 @@ import com.adatafun.utils.data.BeanValidateUtil;
 import com.adatafun.utils.mybatis.common.ResponsePage;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
 
 import java.util.ArrayList;
@@ -61,13 +60,13 @@ public class BackgroundOrderController {
 
         //主订单信息
         OrdOrder ordOrder = new OrdOrder();
-        ordOrder.setCashierId(orderInfo.getCashierId());
         ordOrder.setEnterpriseId(orderInfo.getEnterpriseId());
         ordOrder.setStoreId(orderInfo.getStoreId());
         ordOrder.setDeskNumber(orderInfo.getDeskNumber());
         ordOrder.setUseNumber(orderInfo.getUseNumber());
         ordOrder.setSubOrderNumber(orderInfo.getSubOrderNumber());
         ordOrder.setOrderChannel(ChannelType.POS.value());
+        ordOrder.setLanguage(orderInfo.getLanguage());
         //操作人姓名
         //to do
 
@@ -85,8 +84,8 @@ public class BackgroundOrderController {
             subOrders.add(subOrder);
         }
 
-        orderService.saveOrder(ordOrder, oriOrderLanguage, subOrders, null);
-        return JSONObject.toJSONString(ResUtils.result(Result.STATUS.SUCCESS));
+        String result = orderService.saveOrder(ordOrder, oriOrderLanguage, subOrders, null);
+        return result;
 
     }
 

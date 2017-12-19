@@ -1,6 +1,6 @@
 package com.adatafun.airportshop.order.controller.opeartionoplatform;
 
-import com.adatafun.common.springthrift.annotation.RequestBody;
+import com.adatafun.airportshop.order.service.interfaces.OrderService;
 import com.adatafun.common.springthrift.annotation.RequestMapping;
 import com.adatafun.common.springthrift.annotation.RequestParam;
 import com.adatafun.common.springthrift.annotation.ThriftRequest;
@@ -8,13 +8,12 @@ import com.adatafun.airportshop.order.common.enums.ChannelType;
 import com.adatafun.airportshop.order.pojo.dto.OrderListQueryParamDTO;
 import com.adatafun.airportshop.order.pojo.vo.OrderDetailVO;
 import com.adatafun.airportshop.order.pojo.vo.OrderItemVO;
-import com.adatafun.airportshop.order.service.OrderService;
+import com.adatafun.airportshop.order.service.OrderServiceImpl;
 import com.adatafun.utils.api.ResUtils;
 import com.adatafun.utils.api.Result;
 import com.adatafun.utils.mybatis.common.ResponsePage;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
 
 import java.util.ArrayList;

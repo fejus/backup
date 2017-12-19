@@ -12,8 +12,6 @@ import java.util.List;
 public class BackgroundOrderDTO {
     @NotNull(message = "无语言标识")
     private String language;//语言
-    @NotNull(message = "无操作人标识")
-    private String cashierId;//操作人标识
     @NotNull(message = "无商户标识")
     private String enterpriseId;//商户编码
     @NotNull(message = "无门店标识")
@@ -36,13 +34,6 @@ public class BackgroundOrderDTO {
         this.language = language;
     }
 
-    public String getCashierId() {
-        return cashierId;
-    }
-
-    public void setCashierId(String cashierId) {
-        this.cashierId = cashierId;
-    }
 
     public String getEnterpriseId() {
         return enterpriseId;
