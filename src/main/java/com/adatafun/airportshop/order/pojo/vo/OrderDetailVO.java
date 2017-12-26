@@ -129,6 +129,18 @@ public class OrderDetailVO   {
     private String storeRemarks;//门店备注
     private String getFoodNumber;//取餐码
 
+    /**
+     * 预计出菜时间
+     */
+    private String genFoodTime;
+
+    /**
+     * 位置指引图
+     */
+    private String locationPointImg;
+
+
+
     public String getOrderId() {
         return orderId;
     }
@@ -377,5 +389,21 @@ public class OrderDetailVO   {
 
     public void setStoreRemarks(String storeRemarks) {
         this.storeRemarks = storeRemarks;
+    }
+
+    public String getGenFoodTime() {
+        return genFoodTime;
+    }
+
+    public void setGenFoodTime(String genFoodTime) {
+        this.genFoodTime = genFoodTime;
+    }
+
+    public String getLocationPointImg() {
+        return locationPointImg;
+    }
+
+    public void setLocationPointImg(String locationPointImg) {
+        this.locationPointImg = locationPointImg;
     }
 }

@@ -5,9 +5,21 @@ package com.adatafun.airportshop.order.common.enums;
  * Created by Lin on 2017/11/7.
  */
 public enum OrderStatus {
-    NEW("0", "新订单"),
+    /**
+     * 备注 结账 通知取餐 打印小票 取消订单
+     */
+    NEW("0", "未支付"),
+    /**
+     * 备注 通知取餐 打印小票 取消订单
+     */
     HAVE_PAY("1", "已支付"),
-    HAVE_NOTIFY("2", "已通知取餐"),
+    /**
+     * 备注 通知取餐 打印小票 取消订单
+     */
+    HAVE_NOTIFY("2", "已完成"),
+    /**
+     * 备注
+     */
     HAVE_CANCEL("3", "已取消");
 
     private String value;

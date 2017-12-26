@@ -136,6 +136,17 @@ public class OrderServiceImpl  implements OrderService{
         ordOrder.setPayStatus(PayStatus.NO_PAY.value());
         ordOrder.setCreateTime(new Date());
         ordOrder.setIsDeleted(BooleanEnum.NO.value());
+        String language = oriOrderLanguage.getLanguage();
+
+        // 预计出餐时间 门店位置指引图
+        for (StoreInfoDTO storeInfoDTO : storeInfoLanguages) {
+            if (language != null && language.equals(storeInfoDTO.getLanguage())) {
+                ordOrder.setGenFoodTime(storeInfoDTO.getGenFoodTime());
+                ordOrder.setLocationPointImg(storeInfoDTO.getLocationPointImg());
+            }
+        }
+
+
         ordOrderMapper.insert(ordOrder);
 
         //处理多语言

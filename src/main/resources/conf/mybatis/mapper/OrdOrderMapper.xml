@@ -28,6 +28,8 @@
         <result column="get_food_number" jdbcType="VARCHAR" property="getFoodNumber"/>
         <result column="notify_status" jdbcType="INTEGER" property="notifyStatus"/>
         <result column="notify_read_status" jdbcType="INTEGER" property="notifyReadStatus"/>
+        <result column="gen_food_time" jdbcType="VARCHAR" property="genFoodTime"/>
+        <result column="location_point_img" jdbcType="VARCHAR" property="locationPointImg"/>
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
         <result column="create_user" jdbcType="VARCHAR" property="createUser"/>
         <result column="update_user" jdbcType="VARCHAR" property="updateUser"/>
@@ -39,7 +41,7 @@
     client_id, client_mobile, client_name, order_status, sub_order_number, use_number, 
     desk_number, order_amount, actual_amount, pay_type, pay_time, pay_no, pay_status, 
     language, airport_code, form_id, get_food_number, notify_status, notify_read_status, 
-    create_time, create_user, update_user, update_time, is_deleted
+    gen_food_time, location_point_img, create_time, create_user, update_user, update_time, is_deleted
   </sql>
     <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
         select
@@ -60,7 +62,8 @@
       actual_amount, pay_type, pay_time, 
       pay_no, pay_status, language, 
       airport_code, form_id, get_food_number, 
-      notify_status, notify_read_status, create_time, 
+      notify_status, notify_read_status,
+      gen_food_time, location_point_img, create_time,
       create_user, update_user, update_time, 
       is_deleted)
     values (#{orderId,jdbcType=VARCHAR}, #{orderChannel,jdbcType=VARCHAR}, #{orderNo,jdbcType=VARCHAR}, 
@@ -71,7 +74,8 @@
       #{actualAmount,jdbcType=INTEGER}, #{payType,jdbcType=VARCHAR}, #{payTime,jdbcType=TIMESTAMP}, 
       #{payNo,jdbcType=VARCHAR}, #{payStatus,jdbcType=VARCHAR}, #{language,jdbcType=VARCHAR}, 
       #{airportCode,jdbcType=VARCHAR}, #{formId,jdbcType=VARCHAR}, #{getFoodNumber,jdbcType=VARCHAR}, 
-      #{notifyStatus,jdbcType=INTEGER}, #{notifyReadStatus,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{notifyStatus,jdbcType=INTEGER}, #{notifyReadStatus,jdbcType=INTEGER}, #{genFoodTime,jdbcType=VARCHAR},
+      #{locationPointImg,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP},
       #{createUser,jdbcType=VARCHAR}, #{updateUser,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP}, 
       #{isDeleted,jdbcType=INTEGER})
   </insert>
@@ -475,6 +479,8 @@
         <result column="notify_status" jdbcType="INTEGER" property="notifyStatus"/>
         <result column="notify_read_status" jdbcType="INTEGER" property="notifyReadStatus"/>
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="gen_food_time" jdbcType="VARCHAR" property="genFoodTime"/>
+        <result column="location_point_img" jdbcType="VARCHAR" property="locationPointImg"/>
 
         <association property="billInfo" javaType="com.adatafun.airportshop.order.pojo.vo.BillInfoVO">
             <result column="bill_type" jdbcType="VARCHAR" property="billType"/>
@@ -520,6 +526,8 @@
         oo.form_id,
         oo.get_food_number,
         oo.notify_status,
+        oo.gen_food_time,
+		oo.location_point_img,
 		ool.enterprise_name,
         ool.remarks,
         ool.store_remarks,

@@ -73,6 +73,7 @@ public class BackgroundOrderController {
         //主订单翻译字段信息
         OrdOrderLanguage oriOrderLanguage = new OrdOrderLanguage();
         oriOrderLanguage.setStoreRemarks(orderInfo.getStoreRemarks());
+        oriOrderLanguage.setLanguage(orderInfo.getLanguage());
 
         //子订单
         List<OrdSubOrder> subOrders = new ArrayList<>();
