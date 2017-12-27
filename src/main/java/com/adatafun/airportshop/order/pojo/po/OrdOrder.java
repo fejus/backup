@@ -168,6 +168,16 @@ public class OrdOrder {
     private Integer isDeleted;
 
     /**
+     * 预计出菜时间
+     */
+    private String genFoodTime;
+
+    /**
+     * 位置指引图
+     */
+    private String locationPointImg;
+
+    /**
      * 
      * @return order_id 
      */
@@ -665,5 +675,21 @@ public class OrdOrder {
      */
     public void setIsDeleted(Integer isDeleted) {
         this.isDeleted = isDeleted;
+    }
+
+    public String getGenFoodTime() {
+        return genFoodTime;
+    }
+
+    public void setGenFoodTime(String genFoodTime) {
+        this.genFoodTime = genFoodTime;
+    }
+
+    public String getLocationPointImg() {
+        return locationPointImg;
+    }
+
+    public void setLocationPointImg(String locationPointImg) {
+        this.locationPointImg = locationPointImg;
     }
 }
