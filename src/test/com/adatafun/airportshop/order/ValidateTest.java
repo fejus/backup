@@ -3,8 +3,9 @@ package com.adatafun.airportshop.order;
 import com.adatafun.airportshop.order.pojo.dto.H5OrderDTO;
 import com.adatafun.airportshop.order.pojo.dto.SubOrderDTO;
 import com.adatafun.utils.common.DateUtils;
-import com.adatafun.utils.common.JWTUtil;
-import com.adatafun.utils.data.BeanValidateUtil;
+ import com.adatafun.utils.data.BeanValidateUtil;
+import com.adatafun.utils.secure.token.JWTUtil;
+import com.alibaba.fastjson.JSONObject;
 import org.junit.Test;
 
 import java.text.ParseException;
@@ -55,6 +56,9 @@ public class ValidateTest {
 
     @Test
     public void test5(){
+        JSONObject param = new JSONObject();
+
+
 
     }
 }

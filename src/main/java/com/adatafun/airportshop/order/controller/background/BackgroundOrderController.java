@@ -22,6 +22,7 @@ import com.adatafun.utils.api.Result;
 import com.adatafun.utils.common.StringUtils;
 import com.adatafun.utils.data.BeanValidateUtil;
 import com.adatafun.utils.mybatis.common.ResponsePage;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -40,6 +41,7 @@ public class BackgroundOrderController {
     @Autowired
     private MemberUserService memberUserService;
 
+
     /**
      * 下单
      *
@@ -47,7 +49,10 @@ public class BackgroundOrderController {
      * @return
      */
     @RequestMapping(value = "pos/addOrder")
-    public String addOrder(@ThriftRequest JSONObject request, @RequestBody BackgroundOrderDTO orderInfo) {
+    public String addOrder(@ThriftRequest JSONObject request) {
+
+
+        BackgroundOrderDTO orderInfo = JSON.toJavaObject(request, BackgroundOrderDTO.class);
 
         //校验参数
         String message = getCheckParamMsg(orderInfo);
@@ -73,7 +78,6 @@ public class BackgroundOrderController {
         //主订单翻译字段信息
         OrdOrderLanguage oriOrderLanguage = new OrdOrderLanguage();
         oriOrderLanguage.setStoreRemarks(orderInfo.getStoreRemarks());
-        oriOrderLanguage.setLanguage(orderInfo.getLanguage());
 
         //子订单
         List<OrdSubOrder> subOrders = new ArrayList<>();
@@ -84,6 +88,7 @@ public class BackgroundOrderController {
             subOrder.setProductNumber(subOrderDTO.getProductNumber());
             subOrders.add(subOrder);
         }
+        ordOrder.setSubOrderNumber(subOrders.size());
 
         String result = orderService.saveOrder(ordOrder, oriOrderLanguage, subOrders, null);
         return result;
@@ -152,8 +157,7 @@ public class BackgroundOrderController {
 
         ResponsePage<List<OrderItemVO>> responsePage = orderService.orderListByPage(queryParam);
 
-
-        return JSONObject.toJSONString(ResUtils.result(responsePage));
+        return JSONObject.toJSONStringWithDateFormat(ResUtils.result(responsePage), "yyyy-MM-dd HH:mm:ss");
     }
 
     /**
@@ -165,7 +169,7 @@ public class BackgroundOrderController {
     @RequestMapping(value = "pos/orderDetail")
     public String posOrderDetail(@RequestParam(name = "orderId") String orderId, @RequestParam(name = "language") String language) {
         OrderDetailVO orderDetailVO = orderService.orderDetail(orderId, language);
-        return JSONObject.toJSONString(ResUtils.result(orderDetailVO));
+        return JSONObject.toJSONStringWithDateFormat(ResUtils.result(orderDetailVO), "yyyy-MM-dd HH:mm:ss");
     }
 
     /**

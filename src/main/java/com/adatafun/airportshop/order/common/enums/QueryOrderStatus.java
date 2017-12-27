@@ -6,9 +6,10 @@ package com.adatafun.airportshop.order.common.enums;
  */
 public enum  QueryOrderStatus {
 
-    HAVE_PAY("1", "待支付"),
-    HAVE_NOTIFY("2", "已完成"),
-    HAVE_CANCEL("3", "已取消");
+    WAIT_PAY("1", "待支付"),
+    WAIT_HANDLE("2", "待处理"),
+    HAVE_DONE("3", "已完成");
+
 
     private String value;
     private String display;

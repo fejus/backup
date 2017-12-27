@@ -1,7 +1,7 @@
 package com.adatafun.airportshop.order.common.enums;
 
 /**
- * desc :
+ * desc :支付类型
  * Created by Lin on 2017/8/8.
  */
 public enum  PayType {

@@ -32,6 +32,13 @@
     </properties>
 
     <dependencies>
+        <!-- https://mvnrepository.com/artifact/org.json/json -->
+        <!-- https://mvnrepository.com/artifact/org.json/json -->
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20171018</version>
+        </dependency>
 
         <!-- logback日志配置开始 -->
         <dependency>
@@ -53,7 +60,7 @@
         <dependency>
             <groupId>com.adatafun.utils</groupId>
             <artifactId>adatafun-utils</artifactId>
-            <version>1.0.6</version>
+            <version>1.0.11</version>
         </dependency>
 
         <!-- test-config-center -->

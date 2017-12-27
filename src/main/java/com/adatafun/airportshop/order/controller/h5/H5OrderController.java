@@ -19,10 +19,10 @@ import com.adatafun.airportshop.order.service.OrderServiceImpl;
 import com.adatafun.airportshop.order.service.rpc.MemberUserService;
 import com.adatafun.utils.api.ResUtils;
 import com.adatafun.utils.api.Result;
-import com.adatafun.utils.common.JWTUtil;
-import com.adatafun.utils.common.StringUtils;
+ import com.adatafun.utils.common.StringUtils;
 import com.adatafun.utils.data.BeanValidateUtil;
 import com.adatafun.utils.mybatis.common.ResponsePage;
+import com.adatafun.utils.secure.token.JWTUtil;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -102,6 +102,7 @@ public class H5OrderController {
             subOrder.setProductNumber(subOrderDTO.getProductNumber());
             subOrders.add(subOrder);
         }
+        ordOrder.setSubOrderNumber(subOrders.size());
 
         //发票信息
         OrdBill ordBill = null;
