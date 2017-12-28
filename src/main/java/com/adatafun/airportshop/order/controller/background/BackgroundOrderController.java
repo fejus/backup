@@ -51,7 +51,7 @@ public class BackgroundOrderController {
     @RequestMapping(value = "pos/addOrder")
     public String addOrder(@ThriftRequest JSONObject request) {
 
-
+        String user_id = request.getString("user_id");
         BackgroundOrderDTO orderInfo = JSON.toJavaObject(request, BackgroundOrderDTO.class);
 
         //校验参数
@@ -72,6 +72,7 @@ public class BackgroundOrderController {
         ordOrder.setSubOrderNumber(orderInfo.getSubOrderNumber());
         ordOrder.setOrderChannel(ChannelType.POS.value());
         ordOrder.setLanguage(orderInfo.getLanguage());
+        ordOrder.setCashierId(user_id);
         //操作人姓名
         //to do
 

@@ -41,6 +41,14 @@ public class ThriftClientConfig {
         return serviceClientProxyFactory;
     }
 
+    @Bean(name = "shopAccountClient")
+    public ServiceClientProxyFactory initShopAccountClient() {
+        ServiceClientProxyFactory serviceClientProxyFactory = new ServiceClientProxyFactory();
+        Map<String, String> properties = ConfigCenterUtils.getAppProperties().getProperties("protocol");
+        initServiceClient(serviceClientProxyFactory, properties, "shop.account.client");
+        return serviceClientProxyFactory;
+    }
+
     private void initServiceClient(ServiceClientProxyFactory serviceClientProxyFactory, Map<String, String> properties, String prefix) {
         serviceClientProxyFactory.setIdleTime(Integer.valueOf(properties.get(prefix + ".thrift.client.idleTime")));
         serviceClientProxyFactory.setMaxActive(Integer.valueOf(properties.get(prefix + ".thrift.client.maxActive")));

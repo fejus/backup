@@ -528,6 +528,7 @@
         oo.notify_status,
         oo.gen_food_time,
 		oo.location_point_img,
+		oo.create_user,
 		ool.enterprise_name,
         ool.remarks,
         ool.store_remarks,
@@ -719,7 +720,7 @@
             and o.client_mobile = #{clientMobile,jdbcType=VARCHAR}
         </if>
         <if test='channelType != null and channelType != "" '>
-            and o.channel_type = #{channelType,jdbcType=VARCHAR}
+            and o.order_channel = #{channelType,jdbcType=VARCHAR}
         </if>
         <if test='orderTimeStart != null and orderTimeStart != ""'>
             and o.create_time >= #{orderTimeStart}
@@ -785,7 +786,7 @@
             and oo.client_mobile = #{clientMobile,jdbcType=VARCHAR}
         </if>
         <if test='channelType != null and channelType != "" '>
-            and oo.channel_type = #{channelType,jdbcType=VARCHAR}
+            and oo.order_channel = #{channelType,jdbcType=VARCHAR}
         </if>
         <if test='orderTimeStart != null and orderTimeStart != ""'>
             and oo.create_time >= #{orderTimeStart}
@@ -867,7 +868,7 @@
             and oo.client_mobile = #{clientMobile,jdbcType=VARCHAR}
         </if>
         <if test='channelType != null and channelType != "" '>
-            and oo.channel_type = #{channelType,jdbcType=VARCHAR}
+            and oo.order_channel = #{channelType,jdbcType=VARCHAR}
         </if>
         <if test='orderTimeStart != null and orderTimeStart != ""'>
             and oo.create_time >= #{orderTimeStart}

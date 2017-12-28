@@ -4,14 +4,12 @@ import com.adatafun.airportshop.order.common.enums.*;
 import com.adatafun.airportshop.order.common.util.HttpClientUtils;
 import com.adatafun.airportshop.order.common.util.OrderNoUtil;
 import com.adatafun.airportshop.order.mapper.*;
-import com.adatafun.airportshop.order.pojo.dto.EnterpriseInfoDTO;
-import com.adatafun.airportshop.order.pojo.dto.NotifyGetFoodInfoDTO;
-import com.adatafun.airportshop.order.pojo.dto.OrderListQueryParamDTO;
-import com.adatafun.airportshop.order.pojo.dto.StoreInfoDTO;
+import com.adatafun.airportshop.order.pojo.dto.*;
 import com.adatafun.airportshop.order.pojo.vo.*;
 import com.adatafun.airportshop.order.pojo.po.*;
 import com.adatafun.airportshop.order.service.interfaces.OrderService;
 import com.adatafun.airportshop.order.service.rpc.MemberUserService;
+import com.adatafun.airportshop.order.service.rpc.ShopAccountService;
 import com.adatafun.airportshop.order.service.rpc.ShopInfoService;
 import com.adatafun.airportshop.order.service.rpc.ShopProductService;
 import com.adatafun.utils.api.ResUtils;
@@ -77,6 +75,12 @@ public class OrderServiceImpl  implements OrderService{
 
         //查询门店信息
         List<StoreInfoDTO> storeInfoLanguages = shopInfoService.getStoreInfo(ordOrder.getStoreId());
+
+        // 查询帐号信息
+        UserAccountDTO user = ShopAccountService.getUserInfo(ordOrder.getCashierId());
+        if (user != null) {
+            ordOrder.setCashierName(user.getUserName());
+        }
 
         //查询菜品及其规格信息
         List<String> specicationIds = new ArrayList<>();
@@ -352,6 +356,8 @@ public class OrderServiceImpl  implements OrderService{
     public OrderDetailVO orderDetail(String orderId, String language) {
 
         OrderDetailVO orderDetailVO = ordOrderMapper.selectOrderDetailByOrderId(orderId, language);
+
+
 
         return orderDetailVO;
     }
