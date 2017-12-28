@@ -411,8 +411,8 @@
         <result column="order_id" jdbcType="VARCHAR" property="orderId"/>
         <result column="order_channel" jdbcType="VARCHAR" property="orderChannel"/>
         <result column="order_no" jdbcType="VARCHAR" property="orderNo"/>
-        <result column="enterprise_id" jdbcType="VARCHAR" property="enterpriseId"/>
-        <result column="store_id" jdbcType="VARCHAR" property="storeId"/>
+        <result column="enterprise_id" jdbcType="BIGINT" property="enterpriseId"/>
+        <result column="store_id" jdbcType="BIGINT" property="storeId"/>
         <result column="cashier_id" jdbcType="VARCHAR" property="cashierId"/>
         <result column="cashier_name" jdbcType="VARCHAR" property="cashierName"/>
         <result column="client_id" jdbcType="VARCHAR" property="clientId"/>
@@ -436,8 +436,8 @@
 
         <collection property="subOrderProList" ofType="com.adatafun.airportshop.order.pojo.vo.SubOrderDetailVO">
             <id column="sub_order_id" jdbcType="VARCHAR" property="subOrderId"/>
-            <result column="product_id" jdbcType="VARCHAR" property="productId"/>
-            <result column="specification_id" jdbcType="VARCHAR" property="specificationId"/>
+            <result column="product_id" jdbcType="INTEGER" property="productId"/>
+            <result column="specification_id" jdbcType="INTEGER" property="specificationId"/>
             <result column="product_number" jdbcType="INTEGER" property="productNumber"/>
             <result column="product_img" jdbcType="VARCHAR" property="productImg"/>
             <result column="unit_price" jdbcType="INTEGER" property="unitPrice"/>
@@ -739,14 +739,18 @@
         ) oo
         JOIN
         ord_order_language ool ON ool.order_id = oo.order_id
-        AND ool.language = 'en'
+        <if test="language != null and language != ''">
+            AND ool.language = #{language,jdbcType=VARCHAR}
+        </if>
         AND ool.is_deleted = 0
         JOIN
         ord_sub_order oso ON oso.order_id = oo.order_id
         AND oso.is_deleted = 0
         JOIN
         ord_sub_order_language osol ON osol.sub_order_id = oso.sub_order_id
-        AND osol.language = 'en'
+        <if test="language != null and language != ''">
+            AND osol.language = #{language,jdbcType=VARCHAR}
+        </if>
         AND osol.is_deleted = 0
         ORDER BY oo.create_time DESC
 

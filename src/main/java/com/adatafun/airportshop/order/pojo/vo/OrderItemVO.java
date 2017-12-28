@@ -1,6 +1,7 @@
 package com.adatafun.airportshop.order.pojo.vo;
 
 import com.adatafun.airportshop.order.pojo.po.OrdOrder;
+import com.adatafun.utils.translate.LanguageEnum;
 
 import java.util.Date;
 import java.util.List;
@@ -29,12 +30,12 @@ public class OrderItemVO   {
      * 商户编码
 
      */
-    private String enterpriseId;
+    private Long enterpriseId;
 
     /**
      * 门店编码
      */
-    private String storeId;
+    private Long storeId;
 
     /**
      * 收银员编码
@@ -168,19 +169,19 @@ public class OrderItemVO   {
         this.orderNo = orderNo;
     }
 
-    public String getEnterpriseId() {
+    public Long getEnterpriseId() {
         return enterpriseId;
     }
 
-    public void setEnterpriseId(String enterpriseId) {
+    public void setEnterpriseId(Long enterpriseId) {
         this.enterpriseId = enterpriseId;
     }
 
-    public String getStoreId() {
+    public Long getStoreId() {
         return storeId;
     }
 
-    public void setStoreId(String storeId) {
+    public void setStoreId(Long storeId) {
         this.storeId = storeId;
     }
 
