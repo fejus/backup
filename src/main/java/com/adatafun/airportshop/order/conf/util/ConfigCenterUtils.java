@@ -1,6 +1,8 @@
 package com.adatafun.airportshop.order.conf.util;
 
 import com.adatafun.airportshop.order.conf.center.ConfigDataManager;
+import com.adatafun.utils.common.FileUtils;
+import com.adatafun.utils.common.StringUtils;
 import com.wyun.zookeeper.conf.AppProperties;
 
 import java.io.FileNotFoundException;
@@ -24,50 +26,34 @@ public class ConfigCenterUtils {
 
     public static void connect(String appName) throws InterruptedException {
         String localEnv = System.getenv("local_env");
+        if(localEnv != null && localEnv.length() !=0){
             connect();
+        }else {
+            // 测试配置中心
+            ConfigDataManager dataChange = new ConfigDataManager();
+            appProperties = new AppProperties(appName);
+            appProperties.registerDataChangeHandler(dataChange);
+            System.out.println("zookeeper 初始");
+            appProperties.init();
+            System.out.println("zookeeper 结束");
+//            for (Map.Entry<String, Map<String, String>> stringMapEntry : appProperties.getConfigProperties().entrySet()) {
+//                for (Map.Entry<String, String> entry : stringMapEntry.getValue().entrySet()) {
+//                    System.out.println(entry.getKey() + entry.getValue());
+//                }
+//            }
+        }
     }
 
     private static void connect() throws InterruptedException {
         appProperties = new AppProperties("local");
         Map<String, Map<String, String>> configProperties = appProperties.getConfigProperties();
-        String defaultPath = "conf.properties";
-        Properties props = new Properties();
-        try (InputStream in = ConfigCenterUtils.class.getClassLoader().getResourceAsStream(defaultPath)) {
-            props.load(new InputStreamReader(in, "UTF-8"));
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        // data.source
-        Map<String, String> database = new HashMap<>();
-        Map<String, String> extention = new HashMap<>();
-        Map<String, String> protocol = new HashMap<>();
-        Map<String, String> custom = new HashMap<>();
 
-        for (Map.Entry<Object, Object> entry : props.entrySet()) {
-            if (String.valueOf(entry.getKey()).contains("data.source")) {
-                database.put(String.valueOf(entry.getKey()).replaceFirst("data.source.",""), String.valueOf(entry.getValue()));
-                continue;
-            }
-            if (String.valueOf(entry.getKey()).contains("extention")) {
-                extention.put(String.valueOf(entry.getKey()).replaceFirst("extention.",""), String.valueOf(entry.getValue()));
-                continue;
-            }
-            if (String.valueOf(entry.getKey()).contains("protocol")) {
-                protocol.put(String.valueOf(entry.getKey()).replaceFirst("protocol.",""), String.valueOf(entry.getValue()));
-                continue;
-            }
-            if (String.valueOf(entry.getKey()).contains("custom")) {
-                custom.put(String.valueOf(entry.getKey()).replaceFirst("custom.",""), String.valueOf(entry.getValue()));
-                continue;
-            }
-        }
+        Map<String, Map<String, String>> properties = FileUtils.parsePropertiesForSpringValue("conf.properties");
 
-        configProperties.put("data.source", database);
-        configProperties.put("extention", extention);
-        configProperties.put("protocol", protocol);
-        configProperties.put("custom", custom);
+        configProperties.put("data.source", properties.get("data.source") == null? new HashMap<>():properties.get("data.source"));
+        configProperties.put("extention", properties.get("extention") == null ? new HashMap<>():properties.get("extention"));
+        configProperties.put("protocol", properties.get("protocol") == null ? new HashMap<>():properties.get("protocol"));
+        configProperties.put("custom", properties.get("custom") == null ? new HashMap<>():properties.get("custom"));
     }
 
     public static void delete(String configName){
@@ -84,3 +70,4 @@ public class ConfigCenterUtils {
     }
 
 }
+
