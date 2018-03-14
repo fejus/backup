@@ -128,6 +128,7 @@ public class OrderServiceImpl  implements OrderService{
         OrdOrder ordOrder = new OrdOrder();
         ordOrder.setOrderId(orderId);
         ordOrder.setOrderStatus(OrderStatus.HAVE_PAY.value());
+        ordOrder.setPayStatus(PayStatus.HAVE_PAY.value());
         ordOrderMapper.updateByPrimaryKeySelective(ordOrder);
         JSONObject result = new JSONObject();
         result.put("result","支付成功");
