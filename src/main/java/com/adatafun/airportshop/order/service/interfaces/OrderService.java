@@ -30,6 +30,13 @@ public interface OrderService {
      */
     public String saveOrder(OrdOrder ordOrder, OrdOrderLanguage oriOrderLanguage, List<OrdSubOrder> subOrders, OrdBill ordBill);
 
+    /**
+     * 现金支付时改变订单的状态
+     * @param user_id
+     * @param orderId
+     * @return
+     */
+    public String changeOrderStatus(String user_id, String orderId, String language);
 
     /**
      * 查看订单详情
@@ -103,4 +110,6 @@ public interface OrderService {
      * @return
      */
     public List<OrderListExportResultVO> queryOrderListForExport(OrderListQueryParamDTO queryParam);
+
+
 }
