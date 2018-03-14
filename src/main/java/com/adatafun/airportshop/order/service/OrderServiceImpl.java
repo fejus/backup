@@ -113,6 +113,28 @@ public class OrderServiceImpl  implements OrderService{
     }
 
     /**
+     * 现金支付时改变订单的状态
+     *
+     * @param user_id
+     * @param orderId
+     * @return
+     */
+    @Override
+    public String changeOrderStatus(String user_id, String orderId, String language) {
+        OrderDetailVO orderDetailVO = ordOrderMapper.selectOrderDetailByOrderId(orderId, language);
+        if (orderDetailVO == null) {
+            return JSONObject.toJSONString(ResUtils.result(Result.STATUS.BAD_REQUEST.getStatus(), "订单编号有误"));
+        }
+        OrdOrder ordOrder = new OrdOrder();
+        ordOrder.setOrderId(orderId);
+        ordOrder.setOrderStatus(OrderStatus.HAVE_PAY.value());
+        ordOrderMapper.updateByPrimaryKeySelective(ordOrder);
+        JSONObject result = new JSONObject();
+        result.put("result","支付成功");
+        return JSONObject.toJSONString(ResUtils.result(result));
+    }
+
+    /**
      * 保存主订单信息
      *
      * @param oriOrderLanguage 语言

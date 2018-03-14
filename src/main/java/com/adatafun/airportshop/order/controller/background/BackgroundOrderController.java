@@ -97,6 +97,22 @@ public class BackgroundOrderController {
     }
 
     /**
+     * 现金支付时 改变订单的状态
+     * @param request
+     * @return
+     */
+    @RequestMapping("pos/changeOrderStatus")
+    public String changeOrderStatus(@ThriftRequest JSONObject request) {
+        String user_id = request.getString("user_id");
+
+        String orderId = request.getString("orderId");
+
+        String language = request.getString("language");
+
+        return orderService.changeOrderStatus(user_id, orderId, language);
+    }
+
+    /**
      * 参数校验
      *
      * @param orderInfo
