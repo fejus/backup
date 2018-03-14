@@ -106,6 +106,7 @@ public class OrderServiceImpl  implements OrderService{
 
         JSONObject result = new JSONObject();
         result.put("orderId",orderId);
+        result.put("actualAmount", ordOrder.getActualAmount());
 
         return JSONObject.toJSONString(ResUtils.result(result));
 
