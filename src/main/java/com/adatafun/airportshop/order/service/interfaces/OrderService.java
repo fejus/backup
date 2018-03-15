@@ -39,6 +39,15 @@ public interface OrderService {
     public String changeOrderStatus(String user_id, String orderId, String language);
 
     /**
+     * 推送
+     * @param orderId 订单id
+     * @param channelId 门店id
+     * @param language 语言
+     * @return
+     */
+    String push(String orderId, String channelId, String language);
+
+    /**
      * 查看订单详情
      *
      * @param orderId

@@ -97,7 +97,7 @@ public class BackgroundOrderController {
     }
 
     /**
-     * 现金支付时 改变订单的状态
+     * pos现金支付时 改变订单的状态
      * @param request
      * @return
      */
@@ -110,6 +110,24 @@ public class BackgroundOrderController {
         String language = request.getString("language");
 
         return orderService.changeOrderStatus(user_id, orderId, language);
+    }
+
+    /**
+     * pos push
+     * @param request
+     * @return
+     */
+    @RequestMapping("pos/push")
+    public String push(@ThriftRequest JSONObject request) {
+        String orderId = request.getString("orderId");
+
+        String language = request.getString("language");
+
+        String channelId = request.getString("channelId");
+
+        String result = orderService.push(orderId, channelId, language);
+
+        return result;
     }
 
     /**

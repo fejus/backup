@@ -8,10 +8,7 @@ import com.adatafun.airportshop.order.pojo.dto.*;
 import com.adatafun.airportshop.order.pojo.vo.*;
 import com.adatafun.airportshop.order.pojo.po.*;
 import com.adatafun.airportshop.order.service.interfaces.OrderService;
-import com.adatafun.airportshop.order.service.rpc.MemberUserService;
-import com.adatafun.airportshop.order.service.rpc.ShopAccountService;
-import com.adatafun.airportshop.order.service.rpc.ShopInfoService;
-import com.adatafun.airportshop.order.service.rpc.ShopProductService;
+import com.adatafun.airportshop.order.service.rpc.*;
 import com.adatafun.utils.api.ResUtils;
 import com.adatafun.utils.api.Result;
 import com.adatafun.utils.common.DateUtils;
@@ -29,9 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * desc : 订单服务
@@ -59,6 +54,8 @@ public class OrderServiceImpl  implements OrderService{
     private ShopProductService shopProductService;
     @Autowired
     private ShopInfoService shopInfoService;
+    @Autowired
+    private HardwareCenterService hardwareCenterService;
 
     /**
      * 下单
@@ -133,6 +130,71 @@ public class OrderServiceImpl  implements OrderService{
         JSONObject result = new JSONObject();
         result.put("result","支付成功");
         return JSONObject.toJSONString(ResUtils.result(result));
+    }
+
+    /**
+     * 推送
+     *
+     * @param orderId  订单id
+     * @param channelId  门店id
+     * @param language 语言
+     * @return
+     */
+    @Override
+    public String push(String orderId, String channelId, String language) {
+        //查询门店信息
+        /*List<StoreInfoDTO> storeInfoLanguages = shopInfoService.getStoreInfo(storeId);
+
+        if (storeInfoLanguages == null || storeInfoLanguages.size() == 0) {
+            return JSONObject.toJSONString(ResUtils.result(Result.STATUS.BAD_REQUEST.getStatus(), "门店id有误"));
+        }*/
+
+        OrderDetailVO orderDetailVO = ordOrderMapper.selectOrderDetailByOrderId(orderId, language);
+        if (orderDetailVO == null) {
+            return JSONObject.toJSONString(ResUtils.result(Result.STATUS.BAD_REQUEST.getStatus(), "订单编号有误"));
+        }
+
+        //JSONObject param = getSmallTicketPrintParam(storeInfoLanguages, orderDetailVO, language);
+        JSONObject param = new JSONObject();
+        param.put("orderId", orderId);
+        param.put("printerKey", channelId);
+        param.put("language", language);
+
+        JSONObject jsonObject = hardwareCenterService.push(param);
+
+        return jsonObject.toJSONString();
+    }
+
+    private JSONObject getSmallTicketPrintParam(List<StoreInfoDTO> storeInfoLanguages, OrderDetailVO orderDetailVO, String language) {
+        JSONObject param = new JSONObject();
+        List<Map<String, Object>> productParam = new ArrayList<>();
+
+        for (StoreInfoDTO storeInfo : storeInfoLanguages) {
+            if (storeInfo.getLanguage().equals(language)) {
+                param.put("storeId", storeInfo.getStoreId());
+                param.put("storeName", storeInfo.getStoreName());
+                break;
+            }
+        }
+        param.put("orderNo", orderDetailVO.getOrderNo());
+        param.put("payStatus", orderDetailVO.getPayStatus());
+        param.put("destNumber", orderDetailVO.getDeskNumber());
+        param.put("payTime", orderDetailVO.getPayTime());
+        param.put("eatingCode", orderDetailVO.getGetFoodNumber());
+        param.put("remarks", orderDetailVO.getRemarks());
+
+        for (SubOrderDetailVO subOrder : orderDetailVO.getSubOrderProList()) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("productName", orderDetailVO.getOrderNo());
+            map.put("amount", orderDetailVO.getPayStatus());
+            map.put("price", orderDetailVO.getOrderNo());
+            map.put("totalPrice", orderDetailVO.getPayStatus());
+            productParam.add(map);
+        }
+
+        param.put("product", productParam);
+
+        return param;
     }
 
     /**
