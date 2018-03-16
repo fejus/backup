@@ -35,9 +35,8 @@ public class HardwareCenterService {
                 JSONObject jsonObj = ByteBufferUtil.convertByteBufferToJSON(response.getResponseJSON());
                 if (jsonObj != null && jsonObj.containsKey("msg")) {
                     logger.info("推送结果{}", jsonObj.toJSONString());
-                    String msg = jsonObj.getString("msg");
-                    jsonObject.put("msg", msg);
-                    return jsonObject;
+
+                    return jsonObj;
                 }
             }
         } catch (Exception e) {

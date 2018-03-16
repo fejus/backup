@@ -132,7 +132,10 @@ public class OrderServiceImpl  implements OrderService{
         // 更新成功 进行推送
         String result = push(orderId, bodyNumber, language);
         log.info("推送结果" + result);
-        return result;
+        JSONObject jsonObject = JSONObject.parseObject(result);
+        jsonObject.put("msg", "支付成功");
+        jsonObject.put("data", "");
+        return jsonObject.toJSONString();
     }
 
     /**
