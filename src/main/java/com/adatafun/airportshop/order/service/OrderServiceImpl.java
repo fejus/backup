@@ -117,7 +117,7 @@ public class OrderServiceImpl  implements OrderService{
      * @return
      */
     @Override
-    public String changeOrderStatus(String user_id, String orderId, String language) {
+    public String changeOrderStatus(String user_id, String orderId, String bodyNumber, String language) {
         OrderDetailVO orderDetailVO = ordOrderMapper.selectOrderDetailByOrderId(orderId, language);
         if (orderDetailVO == null) {
             return JSONObject.toJSONString(ResUtils.result(Result.STATUS.BAD_REQUEST.getStatus(), "订单编号有误"));
@@ -126,28 +126,25 @@ public class OrderServiceImpl  implements OrderService{
         ordOrder.setOrderId(orderId);
         ordOrder.setOrderStatus(OrderStatus.HAVE_PAY.value());
         ordOrder.setPayStatus(PayStatus.HAVE_PAY.value());
+        // 更新订单状态
         ordOrderMapper.updateByPrimaryKeySelective(ordOrder);
-        JSONObject result = new JSONObject();
-        result.put("result","支付成功");
-        return JSONObject.toJSONString(ResUtils.result(result));
+
+        // 更新成功 进行推送
+        String result = push(orderId, bodyNumber, language);
+        log.info("推送结果" + result);
+        return result;
     }
 
     /**
      * 推送
      *
      * @param orderId  订单id
-     * @param channelId  门店id
+     * @param bodyNumber  门店id
      * @param language 语言
      * @return
      */
     @Override
-    public String push(String orderId, String channelId, String language) {
-        //查询门店信息
-        /*List<StoreInfoDTO> storeInfoLanguages = shopInfoService.getStoreInfo(storeId);
-
-        if (storeInfoLanguages == null || storeInfoLanguages.size() == 0) {
-            return JSONObject.toJSONString(ResUtils.result(Result.STATUS.BAD_REQUEST.getStatus(), "门店id有误"));
-        }*/
+    public String push(String orderId, String bodyNumber, String language) {
 
         OrderDetailVO orderDetailVO = ordOrderMapper.selectOrderDetailByOrderId(orderId, language);
         if (orderDetailVO == null) {
@@ -157,12 +154,39 @@ public class OrderServiceImpl  implements OrderService{
         //JSONObject param = getSmallTicketPrintParam(storeInfoLanguages, orderDetailVO, language);
         JSONObject param = new JSONObject();
         param.put("orderId", orderId);
-        param.put("printerKey", channelId);
+        param.put("bodyNumber", bodyNumber);
         param.put("language", language);
 
         JSONObject jsonObject = hardwareCenterService.push(param);
 
         return jsonObject.toJSONString();
+    }
+
+    /**
+     * 打印小票
+     *
+     * @param orderId
+     * @param storeId
+     * @param language
+     * @return
+     */
+    @Override
+    public String smallTicketPrint(String orderId, String storeId, String language) {
+        //查询门店信息
+        List<StoreInfoDTO> storeInfoLanguages = shopInfoService.getStoreInfo(storeId);
+
+        if (storeInfoLanguages == null || storeInfoLanguages.size() == 0) {
+            return JSONObject.toJSONString(ResUtils.result(Result.STATUS.BAD_REQUEST.getStatus(), "门店id有误"));
+        }
+
+        OrderDetailVO orderDetailVO = ordOrderMapper.selectOrderDetailByOrderId(orderId, language);
+        if (orderDetailVO == null) {
+            return JSONObject.toJSONString(ResUtils.result(Result.STATUS.BAD_REQUEST.getStatus(), "订单编号有误"));
+        }
+
+
+
+        return null;
     }
 
     private JSONObject getSmallTicketPrintParam(List<StoreInfoDTO> storeInfoLanguages, OrderDetailVO orderDetailVO, String language) {

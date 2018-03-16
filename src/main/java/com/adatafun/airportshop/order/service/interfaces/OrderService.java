@@ -36,16 +36,25 @@ public interface OrderService {
      * @param orderId
      * @return
      */
-    public String changeOrderStatus(String user_id, String orderId, String language);
+    public String changeOrderStatus(String user_id, String orderId, String bodyNumber, String language);
 
     /**
      * 推送
      * @param orderId 订单id
-     * @param channelId 门店id
+     * @param bodyNumber 门店id
      * @param language 语言
      * @return
      */
-    String push(String orderId, String channelId, String language);
+    public String push(String orderId, String bodyNumber, String language);
+
+    /**
+     * 打印小票
+     * @param orderId
+     * @param storeId
+     * @param language
+     * @return
+     */
+    public String smallTicketPrint(String orderId, String storeId, String language);
 
     /**
      * 查看订单详情
@@ -119,6 +128,7 @@ public interface OrderService {
      * @return
      */
     public List<OrderListExportResultVO> queryOrderListForExport(OrderListQueryParamDTO queryParam);
+
 
 
 }

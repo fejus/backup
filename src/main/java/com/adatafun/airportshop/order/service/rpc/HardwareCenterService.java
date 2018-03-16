@@ -47,4 +47,5 @@ public class HardwareCenterService {
         jsonObject.put("msg", "推送出错");
         return jsonObject;
     }
+
 }

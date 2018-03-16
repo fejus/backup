@@ -109,11 +109,13 @@ public class BackgroundOrderController {
 
         String language = request.getString("language");
 
-        return orderService.changeOrderStatus(user_id, orderId, language);
+        String bodyNumber = request.getString("bodyNumber");
+
+        return orderService.changeOrderStatus(user_id, orderId, bodyNumber, language);
     }
 
     /**
-     * pos push
+     * pos 推送
      * @param request
      * @return
      */
@@ -123,9 +125,27 @@ public class BackgroundOrderController {
 
         String language = request.getString("language");
 
-        String channelId = request.getString("channelId");
+        String bodyNumber = request.getString("bodyNumber");
 
-        String result = orderService.push(orderId, channelId, language);
+        String result = orderService.push(orderId, bodyNumber, language);
+
+        return result;
+    }
+
+    /**
+     * pos 打印小票
+     * @param request
+     * @return
+     */
+    @RequestMapping("pos/smallTicketPrint")
+    public String smallTicketPrint(@ThriftRequest JSONObject request) {
+        String orderId = request.getString("orderId");
+
+        String language = request.getString("language");
+
+        String storeId = request.getString("storeId");
+
+        String result = orderService.smallTicketPrint(orderId, storeId, language);
 
         return result;
     }
