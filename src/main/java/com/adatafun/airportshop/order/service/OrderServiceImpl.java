@@ -133,8 +133,7 @@ public class OrderServiceImpl  implements OrderService{
         String result = push(orderId, bodyNumber, language);
         log.info("推送结果" + result);
         JSONObject jsonObject = JSONObject.parseObject(result);
-        jsonObject.put("msg", "支付成功");
-        jsonObject.put("data", "");
+        jsonObject.put("data", "支付成功");
         return jsonObject.toJSONString();
     }
 
