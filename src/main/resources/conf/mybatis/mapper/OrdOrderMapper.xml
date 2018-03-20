@@ -702,7 +702,7 @@
             and o.store_id = #{storeId,jdbcType=VARCHAR}
         </if>
         <if test='enterpriseId != null and enterpriseId != "" '>
-            and o.enterpriseId = #{enterpriseId,jdbcType=VARCHAR}
+            and o.enterprise_id = #{enterpriseId,jdbcType=VARCHAR}
         </if>
         <if test='orderStatus != null and orderStatus != "" '>
             and o.order_status = #{orderStatus,jdbcType=VARCHAR}
