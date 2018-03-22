@@ -147,6 +147,8 @@ public class BackgroundOrderController {
 
         String result = orderService.smallTicketPrint(orderId, storeId, language);
 
+
+
         return result;
     }
 

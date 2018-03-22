@@ -1,5 +1,7 @@
 package com.adatafun.airportshop.order.service.rpc;
 
+import com.adatafun.utils.api.Result;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.wyun.thrift.client.utils.ClientUtil;
 import com.wyun.thrift.server.MyService;
@@ -45,6 +47,30 @@ public class HardwareCenterService {
 
         jsonObject.put("msg", "推送出错");
         return jsonObject;
+    }
+
+    /**
+     * 打印小票
+     * @param request
+     * @return
+     */
+    public JSONObject smallTicketPrint(JSONObject request) {
+        Result<Object> result = new Result<>();
+        try {
+            Response response = ClientUtil.clientSendData(hardwareCenterClient, "businessService", "printOrder", request);
+            if (response != null && response.getResponeCode().getValue() == 200) {
+                JSONObject jsonObj = ByteBufferUtil.convertByteBufferToJSON(response.getResponseJSON());
+                if (jsonObj != null && jsonObj.containsKey("msg")) {
+                    return jsonObj;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        result.setStatus(Result.STATUS.ERROR.getStatus());
+        result.setMsg(Result.STATUS.ERROR.getMsg());
+        result.setData("打印或推送失败");
+        return JSON.parseObject(JSON.toJSONString(request));
     }
 
 }

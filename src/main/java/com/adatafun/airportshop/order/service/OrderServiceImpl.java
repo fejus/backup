@@ -133,7 +133,9 @@ public class OrderServiceImpl  implements OrderService{
         String result = push(orderId, bodyNumber, language);
         log.info("推送结果" + result);
         JSONObject jsonObject = JSONObject.parseObject(result);
-        jsonObject.put("data", "支付成功");
+        if ("10200".equals(jsonObject.getString("status"))) {
+            jsonObject.put("data", "支付成功");
+        }
         return jsonObject.toJSONString();
     }
 
@@ -186,9 +188,12 @@ public class OrderServiceImpl  implements OrderService{
             return JSONObject.toJSONString(ResUtils.result(Result.STATUS.BAD_REQUEST.getStatus(), "订单编号有误"));
         }
 
+        // 获取打印小票信息
+        JSONObject param = getSmallTicketPrintParam(storeInfoLanguages, orderDetailVO, language);
 
+        JSONObject jsonObject = hardwareCenterService.smallTicketPrint(param);
 
-        return null;
+        return jsonObject.toJSONString();
     }
 
     private JSONObject getSmallTicketPrintParam(List<StoreInfoDTO> storeInfoLanguages, OrderDetailVO orderDetailVO, String language) {
@@ -211,10 +216,10 @@ public class OrderServiceImpl  implements OrderService{
 
         for (SubOrderDetailVO subOrder : orderDetailVO.getSubOrderProList()) {
             Map<String, Object> map = new HashMap<>();
-            map.put("productName", orderDetailVO.getOrderNo());
-            map.put("amount", orderDetailVO.getPayStatus());
-            map.put("price", orderDetailVO.getOrderNo());
-            map.put("totalPrice", orderDetailVO.getPayStatus());
+            map.put("productName", subOrder.getProductName());
+            map.put("amount", subOrder.getProductNumber());
+            map.put("price", subOrder.getUnitPrice());
+            map.put("totalPrice", subOrder.getTotalPrice());
             productParam.add(map);
         }
 
@@ -561,7 +566,7 @@ public class OrderServiceImpl  implements OrderService{
             notifyGetFoodInfoDTO.setRemark("这是一条备注");
             notifyGetFoodInfoDTO.setUrl("www.baidu.com");
 
-            String requestUrl = "http://localhost:8888/msgTemplate/notifyGetFood";
+            String requestUrl = "https://wx.funnycode.cn/msgTemplate/notifyGetFood";
             try {
                 String result = HttpClientUtils.post(requestUrl, JSONObject.toJSONString(notifyGetFoodInfoDTO));
                 Result notifyResult = JSONObject.parseObject(result, Result.class);
