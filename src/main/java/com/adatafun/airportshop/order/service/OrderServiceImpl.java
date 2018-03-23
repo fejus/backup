@@ -210,7 +210,7 @@ public class OrderServiceImpl  implements OrderService{
         param.put("orderNo", orderDetailVO.getOrderNo());
         param.put("payStatus", orderDetailVO.getPayStatus());
         param.put("destNumber", orderDetailVO.getDeskNumber());
-        param.put("payTime", orderDetailVO.getPayTime());
+        param.put("orderTime", orderDetailVO.getCreateTime());
         param.put("eatingCode", orderDetailVO.getGetFoodNumber());
         param.put("remarks", orderDetailVO.getRemarks());
 
