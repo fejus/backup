@@ -11,6 +11,7 @@ import com.adatafun.airportshop.order.pojo.vo.OrderItemVO;
 import com.adatafun.airportshop.order.pojo.vo.OrderListExportResultVO;
 import com.adatafun.utils.api.Result;
 import com.adatafun.utils.mybatis.common.ResponsePage;
+import com.alibaba.fastjson.JSONObject;
 
 import java.util.List;
 
@@ -138,5 +139,8 @@ public interface OrderService {
      */
     public List<OrderListExportResultVO> queryOrderListForExport(OrderListQueryParamDTO queryParam);
 
-
+    /**
+     * 二维码收款
+     * */
+    Result cashOrder(JSONObject requst);
 }
