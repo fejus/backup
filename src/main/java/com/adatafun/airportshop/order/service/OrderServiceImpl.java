@@ -9,10 +9,7 @@ import com.adatafun.airportshop.order.pojo.dto.*;
 import com.adatafun.airportshop.order.pojo.vo.*;
 import com.adatafun.airportshop.order.pojo.po.*;
 import com.adatafun.airportshop.order.service.interfaces.OrderService;
-import com.adatafun.airportshop.order.service.rpc.MemberUserService;
-import com.adatafun.airportshop.order.service.rpc.ShopAccountService;
-import com.adatafun.airportshop.order.service.rpc.ShopInfoService;
-import com.adatafun.airportshop.order.service.rpc.ShopProductService;
+import com.adatafun.airportshop.order.service.rpc.*;
 import com.adatafun.utils.api.ResUtils;
 import com.adatafun.utils.api.Result;
 import com.adatafun.utils.common.DateUtils;
@@ -63,6 +60,8 @@ public class OrderServiceImpl  implements OrderService{
     private ShopProductService shopProductService;
     @Autowired
     private ShopInfoService shopInfoService;
+    @Autowired
+    private HardwareCenterService hardwareCenterService;
 
     /**
      * 下单
@@ -109,9 +108,129 @@ public class OrderServiceImpl  implements OrderService{
 
         JSONObject result = new JSONObject();
         result.put("orderId",orderId);
+        result.put("actualAmount", ordOrder.getActualAmount());
 
         return JSONObject.toJSONString(ResUtils.result(result));
 
+    }
+
+    /**
+     * 现金支付时改变订单的状态
+     *
+     * @param user_id
+     * @param orderId
+     * @return
+     */
+    @Override
+    public String changeOrderStatus(String user_id, String orderId, String bodyNumber, String language) {
+        OrderDetailVO orderDetailVO = ordOrderMapper.selectOrderDetailByOrderId(orderId, language);
+        if (orderDetailVO == null) {
+            return JSONObject.toJSONString(ResUtils.result(Result.STATUS.BAD_REQUEST.getStatus(), "订单编号有误"));
+        }
+        OrdOrder ordOrder = new OrdOrder();
+        ordOrder.setOrderId(orderId);
+        ordOrder.setOrderStatus(OrderStatus.HAVE_PAY.value());
+        ordOrder.setPayStatus(PayStatus.HAVE_PAY.value());
+        // 更新订单状态
+        ordOrderMapper.updateByPrimaryKeySelective(ordOrder);
+
+        // 更新成功 进行推送
+        String result = push(orderId, bodyNumber, language);
+        log.info("推送结果" + result);
+        JSONObject jsonObject = JSONObject.parseObject(result);
+        if ("10200".equals(jsonObject.getString("status"))) {
+            jsonObject.put("data", "支付成功");
+        }
+        return jsonObject.toJSONString();
+    }
+
+    /**
+     * 推送
+     *
+     * @param orderId  订单id
+     * @param bodyNumber  门店id
+     * @param language 语言
+     * @return
+     */
+    @Override
+    public String push(String orderId, String bodyNumber, String language) {
+
+        OrderDetailVO orderDetailVO = ordOrderMapper.selectOrderDetailByOrderId(orderId, language);
+        if (orderDetailVO == null) {
+            return JSONObject.toJSONString(ResUtils.result(Result.STATUS.BAD_REQUEST.getStatus(), "订单编号有误"));
+        }
+
+        //JSONObject param = getSmallTicketPrintParam(storeInfoLanguages, orderDetailVO, language);
+        JSONObject param = new JSONObject();
+        param.put("orderId", orderId);
+        param.put("bodyNumber", bodyNumber);
+        param.put("language", language);
+
+        JSONObject jsonObject = hardwareCenterService.push(param);
+
+        return jsonObject.toJSONString();
+    }
+
+    /**
+     * 打印小票
+     *
+     * @param orderId
+     * @param storeId
+     * @param language
+     * @return
+     */
+    @Override
+    public String smallTicketPrint(String orderId, String storeId, String language) {
+        //查询门店信息
+        List<StoreInfoDTO> storeInfoLanguages = shopInfoService.getStoreInfo(storeId);
+
+        if (storeInfoLanguages == null || storeInfoLanguages.size() == 0) {
+            return JSONObject.toJSONString(ResUtils.result(Result.STATUS.BAD_REQUEST.getStatus(), "门店id有误"));
+        }
+
+        OrderDetailVO orderDetailVO = ordOrderMapper.selectOrderDetailByOrderId(orderId, language);
+        if (orderDetailVO == null) {
+            return JSONObject.toJSONString(ResUtils.result(Result.STATUS.BAD_REQUEST.getStatus(), "订单编号有误"));
+        }
+
+        // 获取打印小票信息
+        JSONObject param = getSmallTicketPrintParam(storeInfoLanguages, orderDetailVO, language);
+
+        JSONObject jsonObject = hardwareCenterService.smallTicketPrint(param);
+
+        return jsonObject.toJSONString();
+    }
+
+    private JSONObject getSmallTicketPrintParam(List<StoreInfoDTO> storeInfoLanguages, OrderDetailVO orderDetailVO, String language) {
+        JSONObject param = new JSONObject();
+        List<Map<String, Object>> productParam = new ArrayList<>();
+
+        for (StoreInfoDTO storeInfo : storeInfoLanguages) {
+            if (storeInfo.getLanguage().equals(language)) {
+                param.put("storeId", storeInfo.getStoreId());
+                param.put("storeName", storeInfo.getStoreName());
+                break;
+            }
+        }
+        param.put("orderId", orderDetailVO.getOrderId());
+        param.put("payStatus", orderDetailVO.getPayStatus());
+        param.put("destNumber", orderDetailVO.getDeskNumber());
+        param.put("orderTime", orderDetailVO.getCreateTime());
+        param.put("eatingCode", orderDetailVO.getGetFoodNumber());
+        param.put("remarks", orderDetailVO.getRemarks());
+
+        for (SubOrderDetailVO subOrder : orderDetailVO.getSubOrderProList()) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("productName", subOrder.getProductName());
+            map.put("amount", subOrder.getProductNumber());
+            map.put("price", subOrder.getUnitPrice());
+            map.put("totalPrice", subOrder.getTotalPrice());
+            productParam.add(map);
+        }
+
+        param.put("product", productParam);
+
+        return param;
     }
 
     /**
@@ -452,7 +571,7 @@ public class OrderServiceImpl  implements OrderService{
             notifyGetFoodInfoDTO.setRemark("这是一条备注");
             notifyGetFoodInfoDTO.setUrl("www.baidu.com");
 
-            String requestUrl = "http://localhost:8888/msgTemplate/notifyGetFood";
+            String requestUrl = "https://wx.funnycode.cn/msgTemplate/notifyGetFood";
             try {
                 String result = HttpClientUtils.post(requestUrl, JSONObject.toJSONString(notifyGetFoodInfoDTO));
                 Result notifyResult = JSONObject.parseObject(result, Result.class);

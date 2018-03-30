@@ -66,14 +66,26 @@ public class RedisConfig {
         this.maxWait = Long.parseLong(maxWait);
     }
 
-    @Value("${redis.pool.timeout")
+    @Value("${redis.pool.timeout}")
     public static void setTimeout(String timeout) {
         RedisConfig.timeout = Integer.parseInt(timeout);
     }
 
-    @Value("${redis.pool.test.on.borrow}")
+    @Value("${redis.test.on.borrow}")
     public void setTestOnBorrow(String testOnBorrow) {
         this.testOnBorrow = Boolean.parseBoolean(testOnBorrow);
+    }
+
+    public static void print(){
+        System.out.println(new StringBuilder().append("keyPrefix").append(keyPrefix)
+                .append("host").append(host)
+                .append("port").append(port)
+                .append("password").append(password)
+                .append("maxIdle").append(maxIdle)
+                .append("maxActive").append(maxActive)
+                .append("maxWait").append(maxWait)
+                .append("timeout").append(timeout)
+                .append("testOnBorrow").append(testOnBorrow).toString());
     }
 
 }

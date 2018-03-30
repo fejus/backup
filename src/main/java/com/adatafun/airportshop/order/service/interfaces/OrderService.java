@@ -31,6 +31,31 @@ public interface OrderService {
      */
     public String saveOrder(OrdOrder ordOrder, OrdOrderLanguage oriOrderLanguage, List<OrdSubOrder> subOrders, OrdBill ordBill);
 
+    /**
+     * 现金支付时改变订单的状态
+     * @param user_id
+     * @param orderId
+     * @return
+     */
+    public String changeOrderStatus(String user_id, String orderId, String bodyNumber, String language);
+
+    /**
+     * 推送
+     * @param orderId 订单id
+     * @param bodyNumber 门店id
+     * @param language 语言
+     * @return
+     */
+    public String push(String orderId, String bodyNumber, String language);
+
+    /**
+     * 打印小票
+     * @param orderId
+     * @param storeId
+     * @param language
+     * @return
+     */
+    public String smallTicketPrint(String orderId, String storeId, String language);
 
     /**
      * 查看订单详情

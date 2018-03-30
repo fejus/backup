@@ -18,8 +18,8 @@ public class BackgroundOrderDTO {
     private String storeId;//门店编码
     @NotNull(message = "桌号不能为空")
     private String deskNumber;//桌号
-    @NotNull(message = "使用人数不能为空")
-    @Max(value = 10, message = "最大人数不能超多10人")
+    /*@NotNull(message = "使用人数不能为空")
+    @Max(value = 10, message = "最大人数不能超多10人")*/
     private Integer useNumber;//使用人数
     @Min(value = 1, message = "至少选中一个菜品")
     private Integer subOrderNumber;//子订单数量

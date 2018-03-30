@@ -97,6 +97,62 @@ public class BackgroundOrderController {
     }
 
     /**
+     * pos现金支付时 改变订单的状态
+     * @param request
+     * @return
+     */
+    @RequestMapping("pos/changeOrderStatus")
+    public String changeOrderStatus(@ThriftRequest JSONObject request) {
+        String user_id = request.getString("user_id");
+
+        String orderId = request.getString("orderId");
+
+        String language = request.getString("language");
+
+        String bodyNumber = request.getString("bodyNumber");
+
+        return orderService.changeOrderStatus(user_id, orderId, bodyNumber, language);
+    }
+
+    /**
+     * pos 推送
+     * @param request
+     * @return
+     */
+    @RequestMapping("pos/push")
+    public String push(@ThriftRequest JSONObject request) {
+        String orderId = request.getString("orderId");
+
+        String language = request.getString("language");
+
+        String bodyNumber = request.getString("bodyNumber");
+
+        String result = orderService.push(orderId, bodyNumber, language);
+
+        return result;
+    }
+
+    /**
+     * pos 打印小票
+     * @param request
+     * @return
+     */
+    @RequestMapping("pos/smallTicketPrint")
+    public String smallTicketPrint(@ThriftRequest JSONObject request) {
+        String orderId = request.getString("orderId");
+
+        String language = request.getString("language");
+
+        String storeId = request.getString("storeId");
+
+        String result = orderService.smallTicketPrint(orderId, storeId, language);
+
+
+
+        return result;
+    }
+
+    /**
      * 参数校验
      *
      * @param orderInfo
