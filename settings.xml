@@ -129,7 +129,12 @@ under the License.
       <id>nexus-snapshots</id>    
       <mirrorOf>*</mirrorOf>    
       <url>http://121.43.184.1:7777/nexus/content/groups/public-snapshots</url>    
-    </mirror>    
+    </mirror>
+      <mirror>
+          <id>nexus-snapshots</id>
+          <mirrorOf>*</mirrorOf>
+          <url>http://121.43.184.1:7777/nexus/content/repositories/releases/</url>
+      </mirror>
   </mirrors>
  
     <!-- profiles
