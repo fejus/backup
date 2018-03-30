@@ -196,6 +196,34 @@ public class OrderServiceImpl  implements OrderService{
         return jsonObject.toJSONString();
     }
 
+    /**
+     * 商户后台打印小票 只推送pos机进行打印
+     *
+     * @param orderId
+     * @param storeId
+     * @param language
+     * @return
+     */
+    @Override
+    public String printSmallTicket(String orderId, String storeId, String language) {
+        //查询门店信息
+        List<StoreInfoDTO> storeInfoLanguages = shopInfoService.getStoreInfo(storeId);
+
+        if (storeInfoLanguages == null || storeInfoLanguages.size() == 0) {
+            return JSONObject.toJSONString(ResUtils.result(Result.STATUS.BAD_REQUEST.getStatus(), "门店id有误"));
+        }
+
+        OrderDetailVO orderDetailVO = ordOrderMapper.selectOrderDetailByOrderId(orderId, language);
+        if (orderDetailVO == null) {
+            return JSONObject.toJSONString(ResUtils.result(Result.STATUS.BAD_REQUEST.getStatus(), "订单编号有误"));
+        }
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("orderId", orderId);
+        JSONObject result = hardwareCenterService.printSmallTicket(jsonObject);
+        return result.toJSONString();
+    }
+
+
     private JSONObject getSmallTicketPrintParam(List<StoreInfoDTO> storeInfoLanguages, OrderDetailVO orderDetailVO, String language) {
         JSONObject param = new JSONObject();
         List<Map<String, Object>> productParam = new ArrayList<>();

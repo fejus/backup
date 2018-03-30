@@ -73,4 +73,24 @@ public class HardwareCenterService {
         return JSON.parseObject(JSON.toJSONString(request));
     }
 
+
+    public JSONObject printSmallTicket(JSONObject request) {
+        Result<Object> result = new Result<>();
+        try {
+            Response response = ClientUtil.clientSendData(hardwareCenterClient, "businessService", "printPosOrder", request);
+            if (response != null && response.getResponeCode().getValue() == 200) {
+                JSONObject jsonObj = ByteBufferUtil.convertByteBufferToJSON(response.getResponseJSON());
+                if (jsonObj != null && jsonObj.containsKey("msg")) {
+                    return jsonObj;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        result.setStatus(Result.STATUS.ERROR.getStatus());
+        result.setMsg(Result.STATUS.ERROR.getMsg());
+        result.setData("打印或推送失败");
+        return JSON.parseObject(JSON.toJSONString(request));
+
+    }
 }

@@ -147,7 +147,18 @@ public class BackgroundOrderController {
 
         String result = orderService.smallTicketPrint(orderId, storeId, language);
 
+        return result;
+    }
 
+    @RequestMapping("background/smallTicketPrint")
+    public String printSmallTicket(@ThriftRequest JSONObject request) {
+        String orderId = request.getString("orderId");
+
+        String language = request.getString("language");
+
+        String storeId = request.getString("storeId");
+
+        String result = orderService.printSmallTicket(orderId, storeId, language);
 
         return result;
     }

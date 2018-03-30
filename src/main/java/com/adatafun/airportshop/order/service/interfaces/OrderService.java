@@ -48,13 +48,22 @@ public interface OrderService {
     public String push(String orderId, String bodyNumber, String language);
 
     /**
-     * 打印小票
+     * pos端打印小票 pos和365云打印机 都进行打印
      * @param orderId
      * @param storeId
      * @param language
      * @return
      */
     public String smallTicketPrint(String orderId, String storeId, String language);
+
+    /**
+     * 商户后台打印小票 只推送pos机进行打印
+     * @param orderId
+     * @param storeId
+     * @param language
+     * @return
+     */
+    public String printSmallTicket(String orderId, String storeId, String language);
 
     /**
      * 查看订单详情
@@ -128,7 +137,6 @@ public interface OrderService {
      * @return
      */
     public List<OrderListExportResultVO> queryOrderListForExport(OrderListQueryParamDTO queryParam);
-
 
 
 }
