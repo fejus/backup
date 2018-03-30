@@ -161,6 +161,7 @@ public class BackgroundOrderController {
         String result = orderService.printSmallTicket(orderId, storeId, language);
 
         return result;
+
     }
 
     /**
