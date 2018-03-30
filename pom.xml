@@ -185,6 +185,11 @@
             <version>${mybatis-generator.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.payment</groupId>
+            <artifactId>util</artifactId>
+            <version>1.0</version>
+        </dependency>
 
     </dependencies>
 

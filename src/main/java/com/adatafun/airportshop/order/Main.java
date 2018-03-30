@@ -58,7 +58,7 @@ public class Main {
         context.getEnvironment().setActiveProfiles(profileName);
         context.register(SpringBeanUtil.class);
         context.register(PropertyPlacheholderConfigurerHelp.class);
-        context.scan("com.adatafun.airportshop.order");
+        context.scan("com.adatafun.airportshop.order", "com.**.service");
         context.refresh();
         // thrift server
         Server server = new Server(port);

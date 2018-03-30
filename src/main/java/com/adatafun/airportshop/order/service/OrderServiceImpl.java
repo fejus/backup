@@ -1,5 +1,6 @@
 package com.adatafun.airportshop.order.service;
 
+import com.adatafun.airportshop.order.common.config.PaymentConfig;
 import com.adatafun.airportshop.order.common.enums.*;
 import com.adatafun.airportshop.order.common.util.HttpClientUtils;
 import com.adatafun.airportshop.order.common.util.OrderNoUtil;
@@ -19,7 +20,11 @@ import com.adatafun.utils.common.DateUtils;
 import com.adatafun.utils.mybatis.common.ResponsePage;
 import com.adatafun.utils.translate.LanguageEnum;
 import com.adatafun.utils.translate.LanguageUtil;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
+import com.payment.utils.sign.TransUtil;
+import com.zhiweicloud.guest.common.HttpClientUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,10 +33,9 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * desc : 订单服务
@@ -97,8 +101,7 @@ public class OrderServiceImpl  implements OrderService{
         //保存主订单
         ordOrder.setOrderId(orderId);
         saveMainOrder(ordOrder, subOrders, oriOrderLanguage, enterpriseInfoLanguages, storeInfoLanguages);
-
-        //进行菜品库存的更改
+        //TODO 进行菜品库存的更改
 
 
         //保存发票信息
@@ -548,6 +551,63 @@ public class OrderServiceImpl  implements OrderService{
         return list;
     }
 
+    /**
+     * 二维码收款
+     * */
+    public Result cashOrder(JSONObject request){
+        String tradeType = request.getString("trade_type");
+        String body = request.getString("body");//订单标题
+        String outTradeNo = request.getString("out_trade_no"); //TODO 无订单关联 自行生成
+        String totalFee = request.getString("total_fee");
+        String storeId = request.getString("store_id");
+
+
+        //下单生成签名
+        SortedMap<String, Object> sortedMap = JSONObject.parseObject(request.toJSONString(),
+                new TypeReference<TreeMap<String, Object>>() {});
+        String sign = TransUtil.createSignByMd5(sortedMap, PaymentConfig.SIGN_KEY, true);
+        request.put("sign", sign);
+
+        //TODO 准备订单保存数据，订单状态为待下单
+        OrdCashOrder oco = new OrdCashOrder();
+        String orderId = UUIDUtil.getUUID();
+        oco.setOrderId(orderId);
+        oco.setTradeType(tradeType);
+        oco.setTotalFee(request.getIntValue("total_fee"));
+        oco.setStatus("PRE");
+        oco.setBody(body);
+        oco.setStoreId(storeId);
+
+        //支付下单地址
+        String payUrl = null;
+        if( "wxpay".equals( tradeType ) ){
+            payUrl = PaymentConfig.WXPAY_URL;
+        }else if( "alipay".equals( tradeType ) ){
+            payUrl = PaymentConfig.ALIPAY_URL ;
+        }
+
+        JSONObject responseJson = new JSONObject();
+        try {
+            String resp = HttpClientUtil.httpPostRequest(payUrl, JSON.parseObject(request.toJSONString(), Map.class));
+            JSONObject respJson = JSON.parseObject(resp);
+            oco.setStatus("ORDER");
+            if(respJson != null && respJson.getString("return_code")!=null
+                    && "SUCCESS".equals(respJson.getString("return_code"))){
+                //TODO 修改订单状态为 待支付
+                oco.setStatus("PAID");
+                //返回客户端 （微信支付调用JSSDK调起微信支付，支付宝直接页面跳转支付链接）
+                return ResUtils.result(JSON.parseObject(resp));
+
+            }
+            responseJson.put("return_code", "FAIL");
+            responseJson.put("return_msg", "下单失败");
+            return ResUtils.result(responseJson);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+            return null;
+        }
+
+    }
 
 
 }
